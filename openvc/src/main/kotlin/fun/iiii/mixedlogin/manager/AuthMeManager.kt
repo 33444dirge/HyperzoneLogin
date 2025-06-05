@@ -34,7 +34,7 @@ class AuthMeManager(val plugin: MixedLoginMain) {
     private val loggedPlayers: MutableSet<UUID> = ConcurrentHashMap.newKeySet()
 
     fun onProxyInitialization(injector: Injector, proxy: ProxyServer) {
-        authServers.addAll(MixedLoginMain.getConfig().authServers)
+        authServers.addAll(MixedLoginMain.getConfig().offlineLobby)
         proxy.channelRegistrar.register(MODERN_CHANNEL, LEGACY_CHANNEL)
 
         val childInjector = injector.createChildInjector(object : Module {
@@ -56,8 +56,14 @@ class AuthMeManager(val plugin: MixedLoginMain) {
             .forEach(Listener<*>::register)
 
         plugin.logInfo("未登入服务器: $authServers")
-        if (MixedLoginMain.getConfig().sendOnLogin.enable)
-            plugin.logInfo("登入服务器: ${MixedLoginMain.getConfig().sendOnLogin.servers}")
+        for (serverName in authServers) {
+            val server = proxy.getServer(serverName)
+            if(!server.isPresent){
+                plugin.logger.error("$serverName 是无效服务器")
+            }
+        }
+        if (MixedLoginMain.getConfig().onlineJoinServer.enable)
+            plugin.logInfo("已登入服务器: ${MixedLoginMain.getConfig().onlineJoinServer.servers}")
     }
 
     fun isLogged(player: Player): Boolean = loggedPlayers.contains(player.uniqueId)

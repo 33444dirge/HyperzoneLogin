@@ -1,13 +1,11 @@
 package `fun`.iiii.mixedlogin.listener
 
 import com.velocitypowered.api.event.Subscribe
-import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
 import `fun`.iiii.mixedlogin.MixedLoginMain
 import `fun`.iiii.mixedlogin.type.OfflineUUIDType
 import `fun`.iiii.mixedlogin.util.ExtraUuidUtils
 import `fun`.iiii.openvelocity.api.event.connection.BackendEncryptRequestEvent
 import `fun`.iiii.openvelocity.api.event.connection.OpenPreLoginEvent
-import java.util.UUID
 
 class EventListener {
     @Subscribe

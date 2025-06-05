@@ -61,17 +61,17 @@ class MixedLoginConfig {
         val start = listOf("offline", "o-")
     }
 
-    @Comment("登入服务器")
+    @Comment("离线登入服务器大厅列表，即离线的玩家会被传送的服务器")
     @JvmField
-    val authServers = listOf("login")
+    val offlineLobby = listOf("login")
 
-    @Comment("登入服务器设定")
+    @Comment("在线大厅服务器设定")
     @JvmField
-    val sendOnLogin = SendOnLogin()
+    val onlineJoinServer = OnlineJoinServer()
 
-    @Comment("未登入服务器设定")
+    @Comment("离线大厅服务器设定")
     @JvmField
-    val sendNoLogin = SendNoLogin()
+    val offlineJoinServer = OfflineJoinServer()
 
     @Comment("登入中命令设定")
     @JvmField
@@ -83,7 +83,7 @@ class MixedLoginConfig {
     val advanced = Advanced()
 
     @ConfigSerializable
-    class SendNoLogin {
+    class OfflineJoinServer {
         @Comment("确保未登入的玩家玩家连接登入服务器")
         @JvmField
         val enable = true
@@ -101,8 +101,8 @@ class MixedLoginConfig {
     }
 
     @ConfigSerializable
-    class SendOnLogin {
-        @Comment("登入后的玩家进行服务器加入控制")
+    class OnlineJoinServer {
+        @Comment("对在线的玩家进行服务器加入控制")
         @JvmField
         val enable = true
 
@@ -110,7 +110,7 @@ class MixedLoginConfig {
         @JvmField
         val requirePermission = false
 
-        @Comment("登入的玩家会被送到的服务器")
+        @Comment("在线的玩家会被送到的服务器")
         @JvmField
         val servers = listOf("vc")
 

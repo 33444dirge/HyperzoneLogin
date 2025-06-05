@@ -27,7 +27,7 @@ class InitialServerListener @Inject constructor(
     override fun executeAsync(event: PlayerChooseInitialServerEvent): EventTask {
         return EventTask.withContinuation { continuation ->
             val config = MixedLoginMain.getConfig()
-            if (!config.sendNoLogin.enable) {
+            if (!config.offlineJoinServer.enable) {
                 continuation.resume()
                 plugin.logDebug("PlayerChooseInitialServerEvent | Not enabled")
                 return@withContinuation
@@ -48,10 +48,11 @@ class InitialServerListener @Inject constructor(
             }
 
             val server = AuthMeUtils.serverToSend(
-                config.sendNoLogin.sendMode,
+                config.offlineJoinServer.sendMode,
                 proxy,
-                config.authServers,
-                config.advanced.randomAttempts
+                config.offlineLobby,
+                config.advanced.randomAttempts,
+                logger
             )
 
             // Velocity takes over in case the initial server is not present
@@ -59,7 +60,8 @@ class InitialServerListener @Inject constructor(
             continuation.resume()
             if (server.second == null) {
                 plugin.logDebug { "PlayerChooseInitialServerEvent | ${event.player.username} | Null server" }
-                logger.error("Cannot send the player {} to an auth server", event.player.username)
+                plugin.logDebug("已登入服务器: ${config.offlineLobby}, sendMode: ${config.offlineJoinServer.sendMode}")
+                logger.error("Cannot send the player {} to an valid auth server", event.player.username)
             }
         }
     }
