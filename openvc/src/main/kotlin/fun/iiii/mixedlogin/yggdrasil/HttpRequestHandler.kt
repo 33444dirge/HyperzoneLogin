@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.handler.codec.http.*
 import io.netty.util.CharsetUtil
+import java.net.URLDecoder
 
 class HttpRequestHandler(
     private val processor: YggdrasilResultProcessor
@@ -47,11 +48,12 @@ class HttpRequestHandler(
         val secondSplitURL = firstSplitURL[1].split("&")
         for (s in secondSplitURL) {
             val thirdSplitURL = s.split("=")
-            resMap[thirdSplitURL[0]] = thirdSplitURL[1]
+            resMap[thirdSplitURL[0]] = URLDecoder.decode(thirdSplitURL[1], CharsetUtil.UTF_8)
         }
 
         resMap["method"] = req.method().name()
 
+//        这里需要对http进行解码
         val userName = resMap["username"] ?: ""
         val serverId = resMap["serverId"] ?: ""
         val ip = resMap["ip"] ?: ""
