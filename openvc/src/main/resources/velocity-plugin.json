@@ -1,8 +1,8 @@
 {
-  "id":"mixedlogin",
-  "name":"MixedLogin",
+  "id":"hyperzonelogin",
+  "name":"HyperZoneLogin",
   "version":"0.0.1",
   "authors":["ksqeib"],
   "dependencies":[{"id":"mckotlin-velocity","optional":true}],
-  "main":"fun.iiii.mixedlogin.MixedLoginMain"
+  "main":"fun.iiii.hyperzone.login.HyperzoneLoginMain"
 }

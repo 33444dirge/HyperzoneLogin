@@ -1,4 +1,4 @@
-# MixedLogin
+# HyperZoneLogin
 实现正版和盗版混合登入的插件
 ## 兼容情况
 ### 版本兼容情况

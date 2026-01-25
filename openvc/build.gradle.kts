@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.shadow)
 }
 
-group = "fun.iiii.mixedlogin"
+group = "fun.iiii.hyperzone.login"
 version = "1.0-SNAPSHOT"
 
 repositories {

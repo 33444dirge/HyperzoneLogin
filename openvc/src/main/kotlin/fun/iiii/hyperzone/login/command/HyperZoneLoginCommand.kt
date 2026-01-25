@@ -7,7 +7,7 @@ class HyperZoneLoginCommand : SimpleCommand {
         val args = invocation.arguments()
         val sender = invocation.source()
         if (args.size == 0) {
-            sender.sendPlainMessage("§e/mixedlogin reload")
+            sender.sendPlainMessage("§e/hzl reload")
             return
         }
         if (args[0].equals("reload", ignoreCase = true)) {
@@ -20,6 +20,6 @@ class HyperZoneLoginCommand : SimpleCommand {
     }
 
     override fun hasPermission(invocation: SimpleCommand.Invocation): Boolean {
-        return invocation.source().hasPermission("mixedlogin.admin")
+        return invocation.source().hasPermission("hyperzonelogin.admin")
     }
 } 
