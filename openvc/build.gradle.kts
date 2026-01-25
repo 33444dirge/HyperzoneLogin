@@ -1,30 +1,6 @@
-
 plugins {
-    kotlin("jvm") version "2.3.0" // max version of mckotlin-velocity
-    java
-//    shadow
+    alias(libs.plugins.kotlin)
     alias(libs.plugins.shadow)
-}
-
-group = "fun.iiii.hyperzone.login"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-//    VC
-    maven {
-        name = "papermc"
-        url = uri("https://repo.papermc.io/repository/maven-public/")
-    }
-//    mixin
-    maven {
-        url = uri("https://maven.fabricmc.net/")
-    }
-//    limbo
-    maven {
-        url = uri("https://maven.elytrium.net/repo/")
-    }
-
 }
 
 dependencies {

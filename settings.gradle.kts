@@ -1,13 +1,11 @@
-rootProject.name = "HyperzoneLogin"
-
-include("openvc")
-
 pluginManagement {
-    @Suppress("UnstableApiUsage")
-    includeBuild("build-logic")
     repositories {
         gradlePluginPortal()
         mavenCentral()
     }
 }
+
+rootProject.name = "HyperzoneLogin"
+
+include("openvc")
 include("hyperapi")

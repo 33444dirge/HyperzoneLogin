@@ -1,30 +1,6 @@
-
 plugins {
-    kotlin("jvm") version "2.3.0" // max version of mckotlin-velocity
+    alias(libs.plugins.kotlin)
     java
-//    shadow
-//    alias(libs.plugins.shadow)
-}
-
-group = "fun.iiii.hyperzone.login"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-//    VC
-    maven {
-        name = "papermc"
-        url = uri("https://repo.papermc.io/repository/maven-public/")
-    }
-//    mixin
-    maven {
-        url = uri("https://maven.fabricmc.net/")
-    }
-//    limbo
-    maven {
-        url = uri("https://maven.elytrium.net/repo/")
-    }
-
 }
 
 dependencies {
@@ -60,23 +36,4 @@ dependencies {
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
-}
-
-tasks {
-//    shadowJar {
-//        archiveBaseName.set("HyperZoneLogin-open")
-//        archiveClassifier.set("")
-//        dependencies {
-////            不加会导致mixin之后认不到
-//            include(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
-//            include(dependency("org.jetbrains.kotlin:kotlin-reflect"))
-//
-//            exclude(dependency("org.jetbrains:annotations"))
-////            extra-kotlin
-//            include(dependency("org.spongepowered:configurate-extra-kotlin"))
-//        }
-//    }
-//    build {
-//        dependsOn(shadowJar)
-//    }
 }
