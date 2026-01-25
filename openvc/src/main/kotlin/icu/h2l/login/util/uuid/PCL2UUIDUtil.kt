@@ -1,6 +1,6 @@
-package `fun`.iiii.hyperzone.login.util.uuid
+package icu.h2l.login.util.uuid
 
-import `fun`.iiii.hyperzone.login.HyperzoneLoginMain
+import icu.h2l.login.HyperZoneLoginMain
 import java.util.*
 import kotlin.text.iterator
 
@@ -128,8 +128,8 @@ object PCL2UUIDUtil {
     fun isPCL2UUID(
         uuid: UUID,
         name: String,
-        hashMatch: Boolean = HyperzoneLoginMain.getConfig().uuidMatch.pcl2.hash,
-        slimMatch: Boolean = HyperzoneLoginMain.getConfig().uuidMatch.pcl2.slim
+        hashMatch: Boolean = HyperZoneLoginMain.getConfig().uuidMatch.pcl2.hash,
+        slimMatch: Boolean = HyperZoneLoginMain.getConfig().uuidMatch.pcl2.slim
     ): Boolean {
         if (!hashMatch) return hasPCL2Info(uuid, name)
 

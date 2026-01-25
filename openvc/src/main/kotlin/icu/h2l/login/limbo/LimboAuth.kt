@@ -1,10 +1,10 @@
-package `fun`.iiii.hyperzone.login.limbo
+package icu.h2l.login.limbo
 
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.plugin.PluginContainer
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
-import `fun`.iiii.hyperzone.login.limbo.handler.LimboAuthSessionHandler
+import icu.h2l.login.limbo.handler.LimboAuthSessionHandler
 import net.elytrium.limboapi.api.Limbo
 import net.elytrium.limboapi.api.LimboFactory
 import net.elytrium.limboapi.api.chunk.Dimension

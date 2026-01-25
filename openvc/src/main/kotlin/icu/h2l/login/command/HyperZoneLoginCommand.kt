@@ -1,4 +1,4 @@
-package `fun`.iiii.hyperzone.login.command
+package icu.h2l.login.command
 
 import com.velocitypowered.api.command.SimpleCommand
 
@@ -13,7 +13,7 @@ class HyperZoneLoginCommand : SimpleCommand {
         if (args[0].equals("reload", ignoreCase = true)) {
             sender.sendPlainMessage("§aReloaded!")
             return
-        }else if (args[0].equals("uuid", ignoreCase = true)) {
+        } else if (args[0].equals("uuid", ignoreCase = true)) {
             sender.sendPlainMessage("§aTest!")
             return
         }

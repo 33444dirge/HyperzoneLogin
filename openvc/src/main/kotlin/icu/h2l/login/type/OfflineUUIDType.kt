@@ -1,4 +1,4 @@
-package `fun`.iiii.hyperzone.login.type
+package icu.h2l.login.type
 
 enum class OfflineUUIDType {
     OFFLINE,

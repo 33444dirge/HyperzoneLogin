@@ -1,4 +1,4 @@
-package `fun`.iiii.hyperzone.login.config
+package icu.h2l.login.config
 
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Comment
@@ -40,10 +40,10 @@ class HyperZoneLoginConfig {
     class HostMatch {
         val start = listOf("offline", "o-")
     }
+
     @Comment("高级设定")
     @JvmField
     val advanced = Advanced()
-
 
     @ConfigSerializable
     class Advanced {

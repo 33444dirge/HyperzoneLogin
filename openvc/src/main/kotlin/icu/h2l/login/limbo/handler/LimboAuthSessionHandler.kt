@@ -1,4 +1,4 @@
-package `fun`.iiii.hyperzone.login.limbo.handler
+package icu.h2l.login.limbo.handler
 
 import com.velocitypowered.api.proxy.Player
 import net.elytrium.limboapi.api.Limbo

@@ -1,8 +1,8 @@
-package `fun`.iiii.hyperzone.login.util
+package icu.h2l.login.util
 
-import `fun`.iiii.hyperzone.login.HyperzoneLoginMain
-import `fun`.iiii.hyperzone.login.type.OfflineUUIDType
-import `fun`.iiii.hyperzone.login.util.uuid.PCL2UUIDUtil
+import icu.h2l.login.HyperZoneLoginMain
+import icu.h2l.login.type.OfflineUUIDType
+import icu.h2l.login.util.uuid.PCL2UUIDUtil
 import java.nio.charset.StandardCharsets
 import java.util.*
 
@@ -14,13 +14,13 @@ object ExtraUuidUtils {
             return OfflineUUIDType.ZERO
         }
         return when {
-            HyperzoneLoginMain.getConfig().uuidMatch.offline &&holderUUID == getNormalOfflineUUID(name) -> OfflineUUIDType.OFFLINE
-            HyperzoneLoginMain.getConfig().uuidMatch.pcl2.enable && PCL2UUIDUtil.isPCL2UUID(
+            HyperZoneLoginMain.getConfig().uuidMatch.offline && holderUUID == getNormalOfflineUUID(name) -> OfflineUUIDType.OFFLINE
+            HyperZoneLoginMain.getConfig().uuidMatch.pcl2.enable && PCL2UUIDUtil.isPCL2UUID(
                 holderUUID,
                 name
             ) -> OfflineUUIDType.PCL
 
-            HyperzoneLoginMain.getConfig().uuidMatch.zero && holderUUID == zero -> OfflineUUIDType.ZERO
+            HyperZoneLoginMain.getConfig().uuidMatch.zero && holderUUID == zero -> OfflineUUIDType.ZERO
 
             else -> OfflineUUIDType.UNKNOWN
         }
@@ -29,5 +29,4 @@ object ExtraUuidUtils {
     private fun getNormalOfflineUUID(username: String): UUID {
         return UUID.nameUUIDFromBytes(("OfflinePlayer:$username").toByteArray(StandardCharsets.UTF_8))
     }
-
 } 

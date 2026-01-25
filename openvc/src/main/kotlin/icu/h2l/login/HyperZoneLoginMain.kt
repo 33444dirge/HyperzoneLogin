@@ -1,4 +1,4 @@
-package `fun`.iiii.hyperzone.login
+package icu.h2l.login
 
 import com.google.inject.Inject
 import com.google.inject.Injector
@@ -6,21 +6,21 @@ import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
-import `fun`.iiii.hyperzone.LoginServerManager
-import `fun`.iiii.hyperzone.login.command.HyperZoneLoginCommand
-import `fun`.iiii.hyperzone.login.config.HyperZoneLoginConfig
-import `fun`.iiii.hyperzone.login.limbo.LimboAuth
-import `fun`.iiii.hyperzone.login.listener.EventListener
+import icu.h2l.login.command.HyperZoneLoginCommand
+import icu.h2l.login.config.HyperZoneLoginConfig
+import icu.h2l.login.limbo.LimboAuth
+import icu.h2l.login.listener.EventListener
+import icu.h2l.login.manager.LoginServerManager
+import java.nio.file.Files
+import java.nio.file.Path
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader
 import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
 import org.spongepowered.configurate.objectmapping.ObjectMapper
-import java.nio.file.Files
-import java.nio.file.Path
-import java.util.function.Supplier
 
-class HyperzoneLoginMain @Inject constructor(
+@Suppress("ANNOTATION_WILL_BE_APPLIED_ALSO_TO_PROPERTY_OR_FIELD")
+class HyperZoneLoginMain @Inject constructor(
     private val server: ProxyServer,
     val logger: ComponentLogger,
     @DataDirectory private val dataDirectory: Path,
@@ -30,11 +30,11 @@ class HyperzoneLoginMain @Inject constructor(
     lateinit var limboServerManager: LimboAuth
 
     companion object {
-        private lateinit var instance: HyperzoneLoginMain
+        private lateinit var instance: HyperZoneLoginMain
         private lateinit var hyperZoneLoginConfig: HyperZoneLoginConfig
 
         @JvmStatic
-        fun getInstance(): HyperzoneLoginMain = instance
+        fun getInstance(): HyperZoneLoginMain = instance
 
         @JvmStatic
         fun getConfig(): HyperZoneLoginConfig = hyperZoneLoginConfig
@@ -47,6 +47,7 @@ class HyperzoneLoginMain @Inject constructor(
     @Subscribe
     fun onEnable(event: ProxyInitializeEvent) {
         loadConfig()
+
         loginServerManager = LoginServerManager()
         limboServerManager = LimboAuth(server)
         limboServerManager.load()
@@ -69,7 +70,7 @@ class HyperzoneLoginMain @Inject constructor(
                     .shouldCopyDefaults(true)
                     .header(
                         """
-                            HyperzoneLogin | by ksqeib
+                            HyperZoneLogin | by ksqeib
                             
                         """.trimIndent()
                     ).serializers { s ->
@@ -90,22 +91,5 @@ class HyperzoneLoginMain @Inject constructor(
             hyperZoneLoginConfig = config
         }
     }
+}
 
-
-    fun logInfo(msg: String) {
-        logger.info(msg)
-    }
-
-    fun logDebug(msg: String) {
-        if (hyperZoneLoginConfig.advanced.debug) {
-            logger.info("[DEBUG] $msg")
-        }
-    }
-
-    fun logDebug(msg: Supplier<String>) {
-        if (hyperZoneLoginConfig.advanced.debug) {
-            logger.info("[DEBUG] ${msg.get()}")
-        }
-    }
-
-} 
