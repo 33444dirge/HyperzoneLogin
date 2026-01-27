@@ -5,27 +5,26 @@ import org.spongepowered.configurate.objectmapping.meta.Comment
 
 @ConfigSerializable
 class YggdrasilAuthConfig {
-    @Comment("Yggdrasil 在 hasJoined 阶段时请求是否追加用户 IP 信息")
-    var trackIp: Boolean = false
+    @Comment(
+        """Yggdrasil hasJoined 验证 URL
+        占位变量: {username}, {serverId}, {ip}
+        
+        常见模板：
+        Mojang: https://sessionserver.mojang.com/session/minecraft/hasJoined?username={username}&serverId={serverId}{ip}
+        BlessingSkin: https://example.com/api/yggdrasil/sessionserver/session/minecraft/hasJoined?username={username}&serverId={serverId}{ip}
+        其他: https://example.com/session/minecraft/hasJoined?username={username}&serverId={serverId}{ip}"""
+    )
+    var url: String = "https://sessionserver.mojang.com/session/minecraft/hasJoined?username={username}&serverId={serverId}"
 
-    @Comment("设置 Yggdrasil hasJoined 验证超时时间")
+    @Comment("验证请求超时时间（毫秒）")
     var timeout: Int = 10000
 
-    @Comment("设置 Yggdrasil hasJoined 网络错误时的重试次数")
+    @Comment("网络错误时的重试次数")
     var retry: Int = 0
 
-    @Comment("设置 Yggdrasil hasJoined 重试请求延迟")
+    @Comment("重试请求延迟（毫秒）")
     var retryDelay: Int = 0
 
-    @Comment("Mojang 专用设置")
-    var mojang: MojangConfig = MojangConfig()
-
-    @Comment("BLESSING_SKIN 专用设置")
-    var blessingSkin: BlessingSkinConfig = BlessingSkinConfig()
-
-    @Comment("CUSTOM_YGGDRASIL 专用设置")
-    var custom: CustomYggdrasilConfig = CustomYggdrasilConfig()
-
-    @Comment("设置 Yggdrasil hasJoined 代理")
+    @Comment("代理设置")
     var authProxy: ProxyConfig = ProxyConfig()
 }

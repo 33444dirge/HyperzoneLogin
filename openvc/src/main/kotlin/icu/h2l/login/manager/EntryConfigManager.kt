@@ -170,36 +170,27 @@ class EntryConfigManager(
      * 创建默认配置文件（Mojang 和 Offline）
      */
     private fun createDefaultConfigs(entryDir: Path) {
-        // 创建 Mojang 配置 - 只包含必要字段
-        createSimpleConfigFile(
-            path = entryDir.resolve("mojang$CONFIG_EXTENSION"),
-            entries = mapOf(
-                "id" to "mojang",
-                "name" to "Mojang Official",
-                "serviceType" to "Mojang"
-            ),
-            header = """
-                HyperZoneLogin Entry Configuration - Mojang
-                Mojang 官方正版验证服务配置
-                
-            """.trimIndent()
-        )
-        
-        // 创建 Offline 配置 - 只包含必要字段
-        createSimpleConfigFile(
-            path = entryDir.resolve("offline$CONFIG_EXTENSION"),
-            entries = mapOf(
-                "id" to "offline",
-                "name" to "Offline",
-                "serviceType" to "Offline"
-            ),
-            header = """
-                HyperZoneLogin Entry Configuration - Offline
-                离线模式配置
-                
-            """.trimIndent()
-        )
-        
+        // 创建 Mojang 配置 - 包含 URL 配置
+        val mojangPath = entryDir.resolve("mojang$CONFIG_EXTENSION")
+        val mojangLoader = HoconConfigurationLoader.builder()
+            .defaultOptions { opts: ConfigurationOptions ->
+                opts.header(
+                    """
+                    HyperZoneLogin Entry Configuration - Mojang
+                    Mojang 官方正版验证服务配置
+                    
+                    """.trimIndent()
+                )
+            }
+            .path(mojangPath)
+            .build()
+
+        val mojangNode = mojangLoader.createNode()
+        mojangNode.node("id").set("mojang")
+        mojangNode.node("name").set("Mojang Official")
+        mojangNode.node("yggdrasilAuth", "url").set("https://sessionserver.mojang.com/session/minecraft/hasJoined?username={username}&serverId={serverId}{ip}")
+        mojangLoader.save(mojangNode)
+
         debug { "创建默认配置文件: mojang.conf, offline.conf" }
     }
     

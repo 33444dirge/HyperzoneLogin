@@ -238,9 +238,9 @@ public class MixinInitialLoginSessionHandler {
                     // is enabled.
                     try {
                         if (online) {
-                            logger.info(
-                                    "已开启加密为 {} ({})",
-                                    login.getUsername(), playerIp);
+//                            logger.info(
+//                                    "已开启加密为 {} ({})",
+//                                    login.getUsername(), playerIp);
                             mcConnection.enableEncryption(decryptedSharedSecret);
                         }
                     } catch (GeneralSecurityException e) {
@@ -263,21 +263,21 @@ public class MixinInitialLoginSessionHandler {
                                 }
                             }
                         }
-                        logger.info(
-                                "公钥认证成功 {} whilst contacting Mojang to log in {} ({})",
-                                onlineAuthEvent.isIgnoreKey(), login.getUsername(), playerIp);
+//                        logger.info(
+//                                "公钥认证成功 {} whilst contacting Mojang to log in {} ({})",
+//                                onlineAuthEvent.isIgnoreKey(), login.getUsername(), playerIp);
                         // All went well, initialize the session.
                         AuthSessionHandler authSessionHandler = createHandler(server, inbound, profile, online);
-                        logger.info(
-                                "authSessionHandler创建成功 {} whilst contacting Mojang to log in {} ({})",
-                                authSessionHandler, login.getUsername(), playerIp);
+//                        logger.info(
+//                                "authSessionHandler创建成功 {} whilst contacting Mojang to log in {} ({})",
+//                                authSessionHandler, login.getUsername(), playerIp);
                         if (authSessionHandler == null) {
                             inbound.disconnect(Component.text("内部错误"));
                         }
                         mcConnection.setActiveSessionHandler(StateRegistry.LOGIN, authSessionHandler);
-                        logger.error(
-                                "验证成功 {} whilst contacting Mojang to log in {} ({})",
-                                mcConnection.getActiveSessionHandler().getClass().getName(), login.getUsername(), playerIp);
+//                        logger.error(
+//                                "验证成功 {} whilst contacting Mojang to log in {} ({})",
+//                                mcConnection.getActiveSessionHandler().getClass().getName(), login.getUsername(), playerIp);
                     } else {
                         // Something else went wrong
                         logger.error(

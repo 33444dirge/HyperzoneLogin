@@ -40,9 +40,9 @@ class LimboAuth(server: ProxyServer) {
     @Subscribe
     fun onLoginLimboRegister(event: LoginLimboRegisterEvent) {
         // 在线不验证
-        if (event.player.isOnlineMode) {
-            return
-        }
+//        if (event.player.isOnlineMode) {
+//            return
+//        }
 
         // 必须callBack
         event.addOnJoinCallback { authPlayer(event.player) }

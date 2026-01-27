@@ -9,6 +9,7 @@ import com.velocitypowered.api.proxy.ProxyServer
 import icu.h2l.login.command.HyperZoneLoginCommand
 import icu.h2l.login.config.DatabaseSourceConfig
 import icu.h2l.login.config.OfflineMatchConfig
+import icu.h2l.login.config.RemapConfig
 import icu.h2l.login.database.DatabaseConfig
 import icu.h2l.login.limbo.LimboAuth
 import icu.h2l.login.manager.EntryConfigManager
@@ -38,6 +39,7 @@ class HyperZoneLoginMain @Inject constructor(
         private lateinit var instance: HyperZoneLoginMain
         private lateinit var offlineMatchConfig: OfflineMatchConfig
         private lateinit var databaseSourceConfig: DatabaseSourceConfig
+        private lateinit var remapConfig: RemapConfig
 
         @JvmStatic
         fun getInstance(): HyperZoneLoginMain = instance
@@ -47,6 +49,9 @@ class HyperZoneLoginMain @Inject constructor(
         
         @JvmStatic
         fun getDatabaseConfig(): DatabaseSourceConfig = databaseSourceConfig
+        
+        @JvmStatic
+        fun getRemapConfig(): RemapConfig = remapConfig
     }
 
     init {
@@ -57,6 +62,7 @@ class HyperZoneLoginMain @Inject constructor(
     fun onEnable(event: ProxyInitializeEvent) {
         loadConfig()
         loadDatabaseConfig()
+        loadRemapConfig()
         connectDatabase()
         
         // 必须先注册 DatabaseManager 事件监听器，然后再加载 Entry 配置
@@ -144,6 +150,37 @@ class HyperZoneLoginMain @Inject constructor(
         }
         if (config != null) {
             databaseSourceConfig = config
+        }
+    }
+    
+    private fun loadRemapConfig() {
+        val path = dataDirectory.resolve("remap.conf")
+        val firstCreation = Files.notExists(path)
+        val loader = HoconConfigurationLoader.builder()
+            .defaultOptions { opts: ConfigurationOptions ->
+                opts
+                    .shouldCopyDefaults(true)
+                    .header(
+                        """
+                            HyperZoneLogin Remap Configuration | by ksqeib
+                            
+                        """.trimIndent()
+                    ).serializers { s ->
+                        s.registerAnnotatedObjects(
+                            ObjectMapper.factoryBuilder().addDiscoverer(dataClassFieldDiscoverer()).build()
+                        )
+                    }
+            }
+            .path(path)
+            .build()
+        val node = loader.load()
+        val config = node.get(RemapConfig::class.java)
+        if (firstCreation) {
+            node.set(config)
+            loader.save(node)
+        }
+        if (config != null) {
+            remapConfig = config
         }
     }
     
