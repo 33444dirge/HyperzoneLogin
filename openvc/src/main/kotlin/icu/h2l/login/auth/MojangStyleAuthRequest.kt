@@ -43,19 +43,25 @@ class MojangStyleAuthRequest(
 
     /**
      * 构建验证URL
+     * 使用YggdrasilAuthConfig中的URL模板，替换占位符
      */
     private fun buildAuthUrl(username: String, serverId: String, playerIp: String?): String {
         val escapedUsername = UrlEscapers.urlFormParameterEscaper().escape(username)
         val escapedServerId = UrlEscapers.urlFormParameterEscaper().escape(serverId)
         
-        val baseUrl = config.url.trimEnd('/')
-        var url = "$baseUrl?username=$escapedUsername&serverId=$escapedServerId"
+        // 替换模板中的占位符
+        var url = config.url
+            .replace("{username}", escapedUsername)
+            .replace("{serverId}", escapedServerId)
         
-        // 如果提供了IP地址，添加到URL中
-        playerIp?.let {
-            val escapedIp = UrlEscapers.urlFormParameterEscaper().escape(it)
-            url += "&ip=$escapedIp"
+        // 处理IP占位符：如果有IP则替换为&ip=xxx，否则替换为空字符串
+        val ipParam = if (playerIp != null) {
+            val escapedIp = UrlEscapers.urlFormParameterEscaper().escape(playerIp)
+            "&ip=$escapedIp"
+        } else {
+            ""
         }
+        url = url.replace("{ip}", ipParam)
         
         return url
     }
@@ -81,12 +87,13 @@ class MojangStyleAuthRequest(
     ): AuthenticationResult {
         return when (response.statusCode()) {
             200 -> {
+                val body=response.body()
                 try {
-                    val profile = gson.fromJson(response.body(), GameProfile::class.java)
+                    val profile = gson.fromJson(body, GameProfile::class.java)
                     AuthenticationResult.Success(profile, serverUrl)
                 } catch (e: Exception) {
                     AuthenticationResult.Failure(
-                        reason = "Failed to parse response: ${e.message}",
+                        reason = "Failed to parse response: ${e.message} body:${body}",
                         statusCode = 200
                     )
                 }

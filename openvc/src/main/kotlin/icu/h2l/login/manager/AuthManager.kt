@@ -1,7 +1,10 @@
 package icu.h2l.login.manager
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.velocitypowered.api.util.GameProfile
+import com.velocitypowered.proxy.Velocity
+import com.velocitypowered.proxy.VelocityServer
 import icu.h2l.login.auth.*
 import icu.h2l.login.config.entry.EntryConfig
 import icu.h2l.login.util.debug
@@ -26,7 +29,7 @@ class AuthManager(
         .connectTimeout(Duration.ofSeconds(5))
         .build()
 
-    private val gson = Gson()
+    private val gson = VelocityServer.GENERAL_GSON
 
     /**
      * 玩家一层登入状态
