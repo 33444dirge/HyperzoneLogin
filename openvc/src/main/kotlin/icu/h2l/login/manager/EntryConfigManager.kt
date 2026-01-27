@@ -170,14 +170,14 @@ class EntryConfigManager(
      * 创建默认配置文件（Mojang 和 Offline）
      */
     private fun createDefaultConfigs(entryDir: Path) {
-        // 创建 Mojang 配置
-        createConfigFile(
+        // 创建 Mojang 配置 - 只包含必要字段
+        createSimpleConfigFile(
             path = entryDir.resolve("mojang$CONFIG_EXTENSION"),
-            config = EntryConfig().apply {
-                id = "mojang"
-                name = "Mojang Official"
-                serviceType = "Mojang"
-            },
+            entries = mapOf(
+                "id" to "mojang",
+                "name" to "Mojang Official",
+                "serviceType" to "Mojang"
+            ),
             header = """
                 HyperZoneLogin Entry Configuration - Mojang
                 Mojang 官方正版验证服务配置
@@ -185,14 +185,14 @@ class EntryConfigManager(
             """.trimIndent()
         )
         
-        // 创建 Offline 配置
-        createConfigFile(
+        // 创建 Offline 配置 - 只包含必要字段
+        createSimpleConfigFile(
             path = entryDir.resolve("offline$CONFIG_EXTENSION"),
-            config = EntryConfig().apply {
-                id = "offline"
-                name = "Offline"
-                serviceType = "Offline"
-            },
+            entries = mapOf(
+                "id" to "offline",
+                "name" to "Offline",
+                "serviceType" to "Offline"
+            ),
             header = """
                 HyperZoneLogin Entry Configuration - Offline
                 离线模式配置
@@ -204,7 +204,25 @@ class EntryConfigManager(
     }
     
     /**
-     * 创建配置文件的通用方法
+     * 创建简化的配置文件（只包含指定字段）
+     */
+    private fun createSimpleConfigFile(path: Path, entries: Map<String, String>, header: String) {
+        val loader = HoconConfigurationLoader.builder()
+            .defaultOptions { opts: ConfigurationOptions ->
+                opts.header(header)
+            }
+            .path(path)
+            .build()
+
+        val node = loader.createNode()
+        entries.forEach { (key, value) ->
+            node.node(key).set(value)
+        }
+        loader.save(node)
+    }
+    
+    /**
+     * 创建配置文件的通用方法（包含所有默认值）
      */
     private fun createConfigFile(path: Path, config: EntryConfig, header: String) {
         val loader = HoconConfigurationLoader.builder()
