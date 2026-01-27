@@ -71,6 +71,7 @@ data class DatabaseConfig(
         
         /**
          * 创建 SQLite 配置（推荐用于单机部署）
+         * SQLite 使用单线程模式避免并发问题
          */
         fun sqlite(
             path: String = "./data/hyperzone_login.db",
@@ -81,13 +82,14 @@ data class DatabaseConfig(
             idleTimeout: Long = 600000,
             maxLifetime: Long = 1800000
         ) = DatabaseConfig(
-            jdbcUrl = "jdbc:sqlite:$path",
+            jdbcUrl = "jdbc:sqlite:$path?journal_mode=WAL&busy_timeout=30000",
             username = "",
             password = "",
             driverClassName = "org.sqlite.JDBC",
             tablePrefix = tablePrefix,
-            maximumPoolSize = maximumPoolSize,
-            minimumIdle = minimumIdle,
+            // SQLite 必须使用单连接避免并发问题
+            maximumPoolSize = 1,
+            minimumIdle = 1,
             connectionTimeout = connectionTimeout,
             idleTimeout = idleTimeout,
             maxLifetime = maxLifetime

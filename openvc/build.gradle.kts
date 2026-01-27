@@ -61,6 +61,20 @@ tasks {
             exclude(dependency("org.jetbrains:annotations"))
 //            extra-kotlin
             include(dependency("org.spongepowered:configurate-extra-kotlin"))
+//            Exposed ORM
+            include(dependency("org.jetbrains.exposed:exposed-core"))
+            include(dependency("org.jetbrains.exposed:exposed-dao"))
+            include(dependency("org.jetbrains.exposed:exposed-jdbc"))
+            include(dependency("org.jetbrains.exposed:exposed-java-time"))
+//            Database drivers
+            include(dependency("com.h2database:h2"))
+            include(dependency("org.xerial:sqlite-jdbc"))
+            include(dependency("mysql:mysql-connector-java"))
+            include(dependency("com.zaxxer:HikariCP"))
+//            Authentication libraries
+            include(dependency("at.favre.lib:bcrypt"))
+            include(dependency("dev.samstevens.totp:totp"))
+            include(dependency("de.mkammerer:argon2-jvm-nolibs"))
         }
     }
     build {

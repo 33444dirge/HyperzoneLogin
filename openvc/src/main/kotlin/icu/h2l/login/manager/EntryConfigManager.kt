@@ -37,12 +37,12 @@ class EntryConfigManager(
     fun loadAllConfigs() {
         val entryDir = dataDirectory.resolve(ENTRY_FOLDER)
 
-        // 如果目录不存在，创建目录并生成示例配置
+        // 如果目录不存在，创建目录并生成默认配置
         if (Files.notExists(entryDir)) {
             Files.createDirectories(entryDir)
+            createDefaultConfigs(entryDir)
             createExampleConfig(entryDir)
-            debug { "创建 entry 目录和示例配置文件" }
-            return
+            debug { "创建 entry 目录和默认配置文件" }
         }
 
         // 扫描并加载所有配置文件
@@ -164,6 +164,68 @@ class EntryConfigManager(
         loader.save(node)
 
         debug { "创建示例配置文件: ${examplePath.fileName}" }
+    }
+    
+    /**
+     * 创建默认配置文件（Mojang 和 Offline）
+     */
+    private fun createDefaultConfigs(entryDir: Path) {
+        // 创建 Mojang 配置
+        createConfigFile(
+            path = entryDir.resolve("mojang$CONFIG_EXTENSION"),
+            config = EntryConfig().apply {
+                id = "mojang"
+                name = "Mojang Official"
+                serviceType = "Mojang"
+            },
+            header = """
+                HyperZoneLogin Entry Configuration - Mojang
+                Mojang 官方正版验证服务配置
+                
+            """.trimIndent()
+        )
+        
+        // 创建 Offline 配置
+        createConfigFile(
+            path = entryDir.resolve("offline$CONFIG_EXTENSION"),
+            config = EntryConfig().apply {
+                id = "offline"
+                name = "Offline"
+                serviceType = "Offline"
+            },
+            header = """
+                HyperZoneLogin Entry Configuration - Offline
+                离线模式配置
+                
+            """.trimIndent()
+        )
+        
+        debug { "创建默认配置文件: mojang.conf, offline.conf" }
+    }
+    
+    /**
+     * 创建配置文件的通用方法
+     */
+    private fun createConfigFile(path: Path, config: EntryConfig, header: String) {
+        val loader = HoconConfigurationLoader.builder()
+            .defaultOptions { opts: ConfigurationOptions ->
+                opts
+                    .shouldCopyDefaults(true)
+                    .header(header)
+                    .serializers { s ->
+                        s.registerAnnotatedObjects(
+                            ObjectMapper.factoryBuilder()
+                                .addDiscoverer(dataClassFieldDiscoverer())
+                                .build()
+                        )
+                    }
+            }
+            .path(path)
+            .build()
+
+        val node = loader.createNode()
+        node.set(EntryConfig::class.java, config)
+        loader.save(node)
     }
 
     /**

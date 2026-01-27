@@ -17,8 +17,8 @@ class YggdrasilAuthConfig {
     @Comment("设置 Yggdrasil hasJoined 重试请求延迟")
     var retryDelay: Int = 0
 
-    @Comment("OFFICIAL 专用设置")
-    var official: OfficialConfig = OfficialConfig()
+    @Comment("Mojang 专用设置")
+    var mojang: MojangConfig = MojangConfig()
 
     @Comment("BLESSING_SKIN 专用设置")
     var blessingSkin: BlessingSkinConfig = BlessingSkinConfig()

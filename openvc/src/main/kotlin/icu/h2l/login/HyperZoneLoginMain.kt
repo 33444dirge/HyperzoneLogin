@@ -153,6 +153,8 @@ class HyperZoneLoginMain @Inject constructor(
         val dbConfig = when (databaseSourceConfig.type.uppercase()) {
             "SQLITE" -> {
                 val dbPath = dataDirectory.resolve(databaseSourceConfig.sqlite.path)
+                // 确保数据库文件的父目录存在
+                dbPath.parent?.let { Files.createDirectories(it) }
                 DatabaseConfig.sqlite(
                     path = dbPath.toString(),
                     tablePrefix = databaseSourceConfig.tablePrefix,
@@ -181,6 +183,8 @@ class HyperZoneLoginMain @Inject constructor(
             }
             "H2" -> {
                 val dbPath = dataDirectory.resolve(databaseSourceConfig.h2.path)
+                // 确保数据库文件的父目录存在
+                dbPath.parent?.let { Files.createDirectories(it) }
                 DatabaseConfig.h2(
                     path = dbPath.toString(),
                     tablePrefix = databaseSourceConfig.tablePrefix,
@@ -194,6 +198,8 @@ class HyperZoneLoginMain @Inject constructor(
             else -> {
                 logger.error("不支持的数据库类型: ${databaseSourceConfig.type}, 使用默认 SQLite")
                 val dbPath = dataDirectory.resolve(databaseSourceConfig.sqlite.path)
+                // 确保数据库文件的父目录存在
+                dbPath.parent?.let { Files.createDirectories(it) }
                 DatabaseConfig.sqlite(
                     path = dbPath.toString(),
                     tablePrefix = databaseSourceConfig.tablePrefix
