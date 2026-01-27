@@ -1,15 +1,13 @@
 package icu.h2l.login.manager
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.velocitypowered.api.util.GameProfile
-import com.velocitypowered.proxy.Velocity
 import com.velocitypowered.proxy.VelocityServer
 import icu.h2l.login.auth.*
 import icu.h2l.login.config.entry.EntryConfig
 import icu.h2l.login.util.debug
 import icu.h2l.login.util.info
 import kotlinx.coroutines.*
+import net.kyori.adventure.text.Component
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 import java.net.http.HttpClient
@@ -51,7 +49,7 @@ class AuthManager(
      * Value: 验证结果
      */
     private val authResults = ConcurrentHashMap<String, YggdrasilAuthResult>()
-    
+
     /**
      * 存储LimboAuthSessionHandler实例
      * Key: 玩家用户名
@@ -84,10 +82,11 @@ class AuthManager(
 
             if (result is YggdrasilAuthResult.Success) {
                 info { "玩家 $username 通过 Yggdrasil 验证，Entry: ${result.entryId}" }
-                
+
                 // 验证成功，调用LimboHandler的overVerify方法
                 limboHandlers[username]?.overVerify()
             } else {
+                limboHandlers[username]?.sendMessage(Component.text("玩家 $username Yggdrasil 验证失败"))
                 info { "玩家 $username Yggdrasil 验证失败" }
             }
         }
@@ -102,7 +101,7 @@ class AuthManager(
     fun getAuthResult(username: String): YggdrasilAuthResult? {
         return authResults[username]
     }
-    
+
     /**
      * 注册玩家的LimboAuthSessionHandler实例
      * 应该在玩家开始验证时就调用此方法
@@ -114,7 +113,7 @@ class AuthManager(
         limboHandlers[username] = handler
         debug { "为玩家 $username 注册 LimboAuthSessionHandler" }
     }
-    
+
     /**
      * 获取玩家的LimboAuthSessionHandler实例
      * 
