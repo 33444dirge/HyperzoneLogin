@@ -1,5 +1,7 @@
 package icu.h2l.login.database
 
+import icu.h2l.login.manager.DatabaseConfig
+import icu.h2l.login.manager.DatabaseManager
 import java.util.UUID
 import java.util.logging.Logger
 

@@ -1,4 +1,4 @@
-package icu.h2l.login.database
+package icu.h2l.login.manager
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource

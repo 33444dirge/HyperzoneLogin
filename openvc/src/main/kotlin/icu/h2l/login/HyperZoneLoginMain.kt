@@ -7,8 +7,9 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import icu.h2l.login.command.HyperZoneLoginCommand
-import icu.h2l.login.config.HyperZoneLoginConfig
+import icu.h2l.login.config.OfflineMatchConfig
 import icu.h2l.login.limbo.LimboAuth
+import icu.h2l.login.manager.EntryConfigManager
 import icu.h2l.login.listener.EventListener
 import icu.h2l.login.manager.LoginServerManager
 import java.nio.file.Files
@@ -28,16 +29,17 @@ class HyperZoneLoginMain @Inject constructor(
 ) {
     lateinit var loginServerManager: LoginServerManager
     lateinit var limboServerManager: LimboAuth
+    lateinit var entryConfigManager: EntryConfigManager
 
     companion object {
         private lateinit var instance: HyperZoneLoginMain
-        private lateinit var hyperZoneLoginConfig: HyperZoneLoginConfig
+        private lateinit var offlineMatchConfig: OfflineMatchConfig
 
         @JvmStatic
         fun getInstance(): HyperZoneLoginMain = instance
 
         @JvmStatic
-        fun getConfig(): HyperZoneLoginConfig = hyperZoneLoginConfig
+        fun getConfig(): OfflineMatchConfig = offlineMatchConfig
     }
 
     init {
@@ -47,6 +49,7 @@ class HyperZoneLoginMain @Inject constructor(
     @Subscribe
     fun onEnable(event: ProxyInitializeEvent) {
         loadConfig()
+        loadEntryConfigs()
 
         loginServerManager = LoginServerManager()
         limboServerManager = LimboAuth(server)
@@ -62,7 +65,7 @@ class HyperZoneLoginMain @Inject constructor(
         get() = server
 
     private fun loadConfig() {
-        val path = dataDirectory.resolve("config.conf")
+        val path = dataDirectory.resolve("offlinematch.conf")
         val firstCreation = Files.notExists(path)
         val loader = HoconConfigurationLoader.builder()
             .defaultOptions { opts: ConfigurationOptions ->
@@ -82,14 +85,19 @@ class HyperZoneLoginMain @Inject constructor(
             .path(path)
             .build()
         val node = loader.load()
-        val config = node.get(HyperZoneLoginConfig::class.java)
+        val config = node.get(OfflineMatchConfig::class.java)
         if (firstCreation) {
             node.set(config)
             loader.save(node)
         }
         if (config != null) {
-            hyperZoneLoginConfig = config
+            offlineMatchConfig = config
         }
+    }
+
+    private fun loadEntryConfigs() {
+        entryConfigManager = EntryConfigManager(dataDirectory, logger)
+        entryConfigManager.loadAllConfigs()
     }
 }
 

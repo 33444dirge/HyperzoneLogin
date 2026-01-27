@@ -1,5 +1,6 @@
 package icu.h2l.login.database
 
+import icu.h2l.login.manager.DatabaseManager
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.selectAll
 import java.util.UUID

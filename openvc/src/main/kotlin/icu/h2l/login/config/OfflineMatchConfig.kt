@@ -4,7 +4,7 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Comment
 
 @ConfigSerializable
-class HyperZoneLoginConfig {
+class OfflineMatchConfig {
 
     @Comment("UUID匹配设定")
     val uuidMatch = UUIDMatch()
