@@ -34,6 +34,7 @@ class HyperZoneLoginMain @Inject constructor(
     lateinit var limboServerManager: LimboAuth
     lateinit var entryConfigManager: EntryConfigManager
     lateinit var databaseManager: icu.h2l.login.manager.DatabaseManager
+    lateinit var authManager: icu.h2l.login.manager.AuthManager
 
     companion object {
         private lateinit var instance: HyperZoneLoginMain
@@ -72,6 +73,9 @@ class HyperZoneLoginMain @Inject constructor(
         
         // Entry 加载完成后，创建基础表（Profile 表等）
         createBaseTables()
+        
+        // 初始化AuthManager
+        authManager = icu.h2l.login.manager.AuthManager(entryConfigManager, databaseManager)
 
         loginServerManager = LoginServerManager()
         limboServerManager = LimboAuth(server)
