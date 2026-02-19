@@ -5,7 +5,6 @@ import `fun`.iiii.h2l.api.db.HyperZoneDatabaseManager
 import `fun`.iiii.h2l.api.db.table.ProfileTable
 import `fun`.iiii.h2l.api.event.db.TableSchemaAction
 import `fun`.iiii.h2l.api.event.db.TableSchemaEvent
-import `fun`.iiii.h2l.api.event.db.TableSchemaEventApi
 import icu.h2l.login.auth.online.events.EntryRegisterEvent
 import org.jetbrains.exposed.sql.SchemaUtils
 import java.util.logging.Logger
@@ -22,10 +21,6 @@ class EntryTableManager(
 ) {
     private val entryTables = mutableMapOf<String, EntryTable>()
 
-    init {
-        TableSchemaEventApi.registerListener(::onSchemaEvent)
-    }
-
     fun registerEntry(entryId: String): EntryTable {
         val normalizedId = entryId.lowercase()
         return entryTables.getOrPut(normalizedId) {
@@ -38,7 +33,7 @@ class EntryTableManager(
         return entryTables[entryId.lowercase()]
     }
 
-    private fun createAllEntryTables() {
+    fun createAllEntryTables() {
         databaseManager.executeTransaction {
             entryTables.values.forEach { entryTable ->
                 SchemaUtils.create(entryTable)
@@ -47,7 +42,7 @@ class EntryTableManager(
         }
     }
 
-    private fun dropAllEntryTables() {
+   fun dropAllEntryTables() {
         databaseManager.executeTransaction {
             entryTables.values.forEach { entryTable ->
                 SchemaUtils.drop(entryTable)
@@ -56,7 +51,8 @@ class EntryTableManager(
         }
     }
 
-    private fun onSchemaEvent(event: TableSchemaEvent) {
+    @Subscribe
+    fun onSchemaEvent(event: TableSchemaEvent) {
         when (event.action) {
             TableSchemaAction.CREATE_ALL -> createAllEntryTables()
             TableSchemaAction.DROP_ALL -> dropAllEntryTables()

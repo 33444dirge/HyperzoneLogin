@@ -1,12 +1,12 @@
 package icu.h2l.login.manager
 
+import com.velocitypowered.api.proxy.ProxyServer
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import `fun`.iiii.h2l.api.db.HyperZoneDatabaseManager
 import `fun`.iiii.h2l.api.db.table.ProfileTable
 import `fun`.iiii.h2l.api.event.db.TableSchemaAction
 import `fun`.iiii.h2l.api.event.db.TableSchemaEvent
-import `fun`.iiii.h2l.api.event.db.TableSchemaEventApi
 import icu.h2l.login.database.DatabaseConfig
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -19,7 +19,8 @@ import java.util.logging.Logger
  */
 class DatabaseManager(
     private val logger: Logger,
-    private val config: DatabaseConfig
+    private val config: DatabaseConfig,
+    private val proxy: ProxyServer
 ) : HyperZoneDatabaseManager {
     private lateinit var database: Database
     private lateinit var dataSource: HikariDataSource
@@ -84,24 +85,6 @@ class DatabaseManager(
     fun getProfileTable(): ProfileTable = profileTable
     
     /**
-     * 创建所有表
-     */
-    fun createTables() {
-        executeTransaction {
-            logger.info("正在创建数据库表...")
-            
-            // 创建档案表
-            SchemaUtils.create(profileTable)
-            logger.info("已创建表: ${profileTable.tableName}")
-        }
-
-        // 通知模块创建所有入口表
-        TableSchemaEventApi.fire(TableSchemaEvent(TableSchemaAction.CREATE_ALL))
-
-        logger.info("数据库表创建完成！")
-    }
-    
-    /**
      * 创建基础表（不包括 Entry 表）
      * Entry 表由事件系统自动创建
      */
@@ -120,7 +103,7 @@ class DatabaseManager(
         logger.warning("正在删除数据库表...")
 
         // 通知模块删除所有入口表
-        TableSchemaEventApi.fire(TableSchemaEvent(TableSchemaAction.DROP_ALL))
+        proxy.eventManager.fire(TableSchemaEvent(TableSchemaAction.DROP_ALL)).join()
 
         executeTransaction {
             // 删除档案表

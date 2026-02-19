@@ -6,6 +6,8 @@ import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
+import `fun`.iiii.h2l.api.event.db.TableSchemaAction
+import `fun`.iiii.h2l.api.event.db.TableSchemaEvent
 import `fun`.iiii.h2l.api.module.HyperSubModule
 import icu.h2l.login.command.HyperZoneLoginCommand
 import icu.h2l.login.config.DatabaseSourceConfig
@@ -66,11 +68,11 @@ class HyperZoneLoginMain @Inject constructor(
         loadDatabaseConfig()
         loadRemapConfig()
         connectDatabase()
+        // 创建基础表（Profile 表等）
+        createBaseTables()
 
         registerModule("icu.h2l.login.auth.online.YggdrasilSubModule")
-        
-        // Entry 加载完成后，创建基础表（Profile 表等）
-        createBaseTables()
+
 
         loginServerManager = LoginServerManager()
         limboServerManager = LimboAuth(server)
@@ -257,7 +259,8 @@ class HyperZoneLoginMain @Inject constructor(
         
         databaseManager = icu.h2l.login.manager.DatabaseManager(
             logger = java.util.logging.Logger.getLogger("HyperZoneLogin"),
-            config = dbConfig
+            config = dbConfig,
+            proxy = proxy
         )
         
         databaseManager.connect()
