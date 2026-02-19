@@ -4,7 +4,8 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":hyperapi"))
+    implementation(project(":api"))
+    implementation(project(":vcinjector"))
 // limboAuth
     implementation("at.favre.lib:bcrypt:0.9.0")
     implementation("dev.samstevens.totp:totp:1.7.1")
@@ -75,6 +76,8 @@ tasks {
             include(dependency("at.favre.lib:bcrypt"))
             include(dependency("dev.samstevens.totp:totp"))
             include(dependency("de.mkammerer:argon2-jvm-nolibs"))
+//           api
+            include(dependency(":api"))
         }
     }
     build {

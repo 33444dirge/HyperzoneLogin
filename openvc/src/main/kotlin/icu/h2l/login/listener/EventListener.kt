@@ -1,8 +1,8 @@
 package icu.h2l.login.listener
 
 import com.velocitypowered.api.event.Subscribe
-import `fun`.iiii.openvelocity.api.event.connection.OnlineAuthEvent
-import `fun`.iiii.openvelocity.api.event.connection.OpenPreLoginEvent
+import `fun`.iiii.h2l.api.event.connection.OnlineAuthEvent
+import `fun`.iiii.h2l.api.event.connection.OpenPreLoginEvent
 import icu.h2l.login.HyperZoneLoginMain
 import icu.h2l.login.type.OfflineUUIDType
 import icu.h2l.login.util.ExtraUuidUtils
@@ -31,9 +31,6 @@ class EventListener {
 
     @Subscribe
     fun onPreLogin(event: OnlineAuthEvent) {
-//        无论如何都应该直接放进来，然后进行后验，最后再重映射，在这里把验证需要的数据劫持下来并开始验证，先随便给profile
-        event.isSuccess = true
-        event.isIgnoreKey = true
         val username = event.userName
         val serverId = event.serverId
         val playerIp = event.playerIp

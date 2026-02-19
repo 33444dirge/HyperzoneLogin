@@ -1,7 +1,7 @@
 package icu.h2l.login.manager
 
 import com.velocitypowered.api.proxy.ProxyServer
-import icu.h2l.login.api.EntryRegisterEvent
+import icu.h2l.login.`in`.events.EntryRegisterEvent
 import icu.h2l.login.config.entry.EntryConfig
 import icu.h2l.login.util.debug
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger

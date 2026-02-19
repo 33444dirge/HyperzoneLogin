@@ -1,8 +1,6 @@
 package icu.h2l.login.limbo.handler
 
 import com.velocitypowered.api.proxy.Player
-import icu.h2l.login.limbo.command.LimboCommandHandler
-import icu.h2l.login.limbo.command.LimboCommandManager
 import net.elytrium.limboapi.api.Limbo
 import net.elytrium.limboapi.api.LimboSessionHandler
 import net.elytrium.limboapi.api.player.LimboPlayer
@@ -28,27 +26,8 @@ class LimboAuthSessionHandler(private val proxyPlayer: Player) : LimboSessionHan
      */
     private val messageQueue = ConcurrentLinkedQueue<Component>()
 
-    /**
-     * 命令处理器（可以是全局的或者为此会话自定义的）
-     */
-    private var commandHandler: LimboCommandHandler = LimboCommandManager.getHandler()
-
-    /**
-     * 设置自定义的命令处理器
-     * 如果不设置，则使用全局的命令管理器
-     */
-    fun setCommandHandler(handler: LimboCommandHandler) {
-        this.commandHandler = handler
-    }
-
-    /**
-     * 获取当前使用的命令处理器
-     */
-    fun getCommandHandler(): LimboCommandHandler {
-        return commandHandler
-    }
-
     override fun onSpawn(server: Limbo, player: LimboPlayer) {
+//        这里添加对应的LimboSpawn事件 不要传递Limbo，只传递LimboPlayer和proxyPlayer以及自身LimboAuthSessionHandler
         this.player = player
         this.player.disableFalling()
 
@@ -57,18 +36,6 @@ class LimboAuthSessionHandler(private val proxyPlayer: Player) : LimboSessionHan
 
         // 发送消息队列中的所有消息
         flushMessageQueue()
-    }
-
-    override fun onChat(message: String) {
-        // 使用命令处理器处理消息
-        val handled = commandHandler.handleMessage(this, proxyPlayer, message)
-        
-        // 如果消息没有被命令系统处理，可以在这里添加其他逻辑
-        if (!handled) {
-            // 例如：显示提示信息
-            proxyPlayer.sendPlainMessage("未知命令: $message")
-            proxyPlayer.sendPlainMessage("输入 'help' 查看可用命令")
-        }
     }
 
     /**

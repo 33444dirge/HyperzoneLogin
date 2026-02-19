@@ -8,4 +8,5 @@ pluginManagement {
 rootProject.name = "HyperzoneLogin"
 
 include("openvc")
-include("hyperapi")
+include("vcinjector")
+include("api")

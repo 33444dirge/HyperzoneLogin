@@ -4,6 +4,7 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":api"))
 // limboAuth
     implementation("at.favre.lib:bcrypt:0.9.0")
     implementation("dev.samstevens.totp:totp:1.7.1")

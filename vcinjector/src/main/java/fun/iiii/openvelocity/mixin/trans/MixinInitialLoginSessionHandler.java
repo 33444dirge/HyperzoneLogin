@@ -16,8 +16,8 @@ import com.velocitypowered.proxy.protocol.netty.MinecraftDecoder;
 import com.velocitypowered.proxy.protocol.packet.EncryptionRequestPacket;
 import com.velocitypowered.proxy.protocol.packet.EncryptionResponsePacket;
 import com.velocitypowered.proxy.protocol.packet.ServerLoginPacket;
-import fun.iiii.openvelocity.api.event.connection.OnlineAuthEvent;
-import fun.iiii.openvelocity.api.event.connection.OpenPreLoginEvent;
+import fun.iiii.h2l.api.event.connection.OnlineAuthEvent;
+import fun.iiii.h2l.api.event.connection.OpenPreLoginEvent;
 import fun.iiii.openvelocity.mixin.IMixinLoginInboundConnection;
 import fun.iiii.openvelocity.mixin.util.AuthSessionHandlerFactory;
 import net.kyori.adventure.text.Component;
@@ -197,7 +197,7 @@ public class MixinInitialLoginSessionHandler {
                             cState = 2;
 //                            this.currentState = InitialLoginSessionHandler.LoginState.ENCRYPTION_REQUEST_SENT;
                         } else {
-                            doLogin(false, openPreLoginEvent.getServerId(), null);
+                            doLogin(false, null, null);
                         }
 
                     }).exceptionally((ex) -> {
@@ -218,19 +218,11 @@ public class MixinInitialLoginSessionHandler {
 
     private void doLogin(boolean online, String serverId, byte[] decryptedSharedSecret) {
         String playerIp = ((InetSocketAddress) mcConnection.getRemoteAddress()).getHostString();
-        OnlineAuthEvent onlineAuthEvent = new OnlineAuthEvent(login, serverId, playerIp, online);
+        OnlineAuthEvent onlineAuthEvent = new OnlineAuthEvent(login.getUsername(), login.getHolderUuid(), serverId, playerIp, online);
         server.getEventManager().fire(onlineAuthEvent).thenRunAsync(
                 () -> {
                     if (mcConnection.isClosed()) {
                         // The player disconnected after we authenticated them.
-                        return;
-                    }
-
-                    Throwable throwable = onlineAuthEvent.getThrowable();
-
-                    if (throwable != null) {
-                        logger.error("Unable to authenticate player", throwable);
-                        inbound.disconnect(onlineAuthEvent.getDisconnectComponent());
                         return;
                     }
 
@@ -251,40 +243,14 @@ public class MixinInitialLoginSessionHandler {
                         return;
                     }
 
-                    if (onlineAuthEvent.isSuccess()) {
-                        final GameProfile profile = onlineAuthEvent.getGameProfile();
-                        // Not so fast, now we verify the public key for 1.19.1+
-                        if (!onlineAuthEvent.isIgnoreKey()) {
-                            if (inbound.getIdentifiedKey() != null
-                                    && inbound.getIdentifiedKey().getKeyRevision() == IdentifiedKey.Revision.LINKED_V2
-                                    && inbound.getIdentifiedKey() instanceof final IdentifiedKeyImpl key) {
-                                if (!key.internalAddHolder(profile.getId())) {
-                                    inbound.disconnect(Component.text("无效的公钥"));
-                                }
-                            }
-                        }
-//                        logger.info(
-//                                "公钥认证成功 {} whilst contacting Mojang to log in {} ({})",
-//                                onlineAuthEvent.isIgnoreKey(), login.getUsername(), playerIp);
-                        // All went well, initialize the session.
-                        AuthSessionHandler authSessionHandler = createHandler(server, inbound, profile, online);
-//                        logger.info(
-//                                "authSessionHandler创建成功 {} whilst contacting Mojang to log in {} ({})",
-//                                authSessionHandler, login.getUsername(), playerIp);
-                        if (authSessionHandler == null) {
-                            inbound.disconnect(Component.text("内部错误"));
-                        }
-                        mcConnection.setActiveSessionHandler(StateRegistry.LOGIN, authSessionHandler);
-//                        logger.error(
-//                                "验证成功 {} whilst contacting Mojang to log in {} ({})",
-//                                mcConnection.getActiveSessionHandler().getClass().getName(), login.getUsername(), playerIp);
-                    } else {
-                        // Something else went wrong
-                        logger.error(
-                                "验证失败 {} whilst contacting Mojang to log in {} ({})",
-                                onlineAuthEvent.getDisconnectComponent().toString(), login.getUsername(), playerIp);
-                        inbound.disconnect(onlineAuthEvent.getDisconnectComponent());
+                    final GameProfile profile = onlineAuthEvent.getGameProfile();
+
+                    AuthSessionHandler authSessionHandler = createHandler(server, inbound, profile, online);
+
+                    if (authSessionHandler == null) {
+                        inbound.disconnect(Component.text("内部错误[AuthSessionHandler对象创建失败]"));
                     }
+                    mcConnection.setActiveSessionHandler(StateRegistry.LOGIN, authSessionHandler);
                 }, mcConnection.eventLoop());
     }
 

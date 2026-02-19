@@ -12,7 +12,7 @@ import net.elytrium.limboapi.api.chunk.Dimension
 import net.elytrium.limboapi.api.chunk.VirtualWorld
 import net.elytrium.limboapi.api.event.LoginLimboRegisterEvent
 import net.elytrium.limboapi.api.player.GameMode
-
+//用于注册到limbo服务器，不需要融合于任何模块目前
 class LimboAuth(server: ProxyServer) {
     private val factory: LimboFactory
     private lateinit var authServer: Limbo

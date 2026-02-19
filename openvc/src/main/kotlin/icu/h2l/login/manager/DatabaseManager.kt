@@ -3,7 +3,7 @@ package icu.h2l.login.manager
 import com.velocitypowered.api.event.Subscribe
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import icu.h2l.login.api.EntryRegisterEvent
+import icu.h2l.login.`in`.events.EntryRegisterEvent
 import icu.h2l.login.database.DatabaseConfig
 import icu.h2l.login.database.tables.EntryTable
 import icu.h2l.login.database.tables.ProfileTable

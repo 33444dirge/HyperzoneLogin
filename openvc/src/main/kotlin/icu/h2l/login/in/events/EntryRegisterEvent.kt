@@ -1,4 +1,4 @@
-package icu.h2l.login.api
+package icu.h2l.login.`in`.events
 
 import icu.h2l.login.config.entry.EntryConfig
 
