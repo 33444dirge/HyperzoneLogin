@@ -2,9 +2,10 @@ package icu.h2l.login.auth.online.manager
 
 import com.velocitypowered.api.proxy.ProxyServer
 import `fun`.iiii.h2l.api.log.debug
+import `fun`.iiii.h2l.api.log.error
+import `fun`.iiii.h2l.api.log.info
 import icu.h2l.login.auth.online.config.entry.EntryConfig
 import icu.h2l.login.auth.online.events.EntryRegisterEvent
-import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader
 import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
@@ -20,7 +21,6 @@ import kotlin.io.path.name
  */
 class EntryConfigManager(
     private val dataDirectory: Path,
-    private val logger: ComponentLogger,
     private val proxyServer: ProxyServer
 ) {
     private val entryConfigs = mutableMapOf<String, EntryConfig>()
@@ -48,7 +48,7 @@ class EntryConfigManager(
         // 扫描并加载所有配置文件
         scanAndLoadConfigs(entryDir)
 
-        logger.info("成功加载 ${entryConfigs.size} 个 Entry 配置文件")
+        info { "成功加载 ${entryConfigs.size} 个 Entry 配置文件" }
     }
 
     /**
@@ -109,7 +109,7 @@ class EntryConfigManager(
                 // 验证配置有效性
                 // 检查 ID 是否重复
                 if (entryConfigs.values.any { it.id == config.id }) {
-                    logger.error("配置文件 ${path.fileName} 的 ID ${config.id} 与其他配置重复，跳过加载")
+                    error { "配置文件 ${path.fileName} 的 ID ${config.id} 与其他配置重复，跳过加载" }
                     return
                 }
 
@@ -120,10 +120,10 @@ class EntryConfigManager(
                 // 发布 Entry 注册事件
                 proxyServer.eventManager.fireAndForget(EntryRegisterEvent(configName, config))
             } else {
-                logger.error("无法解析配置文件: ${path.fileName}")
+                error { "无法解析配置文件: ${path.fileName}" }
             }
         } catch (e: Exception) {
-            logger.error("加载配置文件 ${path.fileName} 时出错: ${e.message}", e)
+            error(e) { "加载配置文件 ${path.fileName} 时出错: ${e.message}" }
         }
     }
 

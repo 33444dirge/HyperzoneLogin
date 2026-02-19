@@ -3,9 +3,9 @@ package icu.h2l.login.auth.online.db
 import com.velocitypowered.api.event.Subscribe
 import `fun`.iiii.h2l.api.db.HyperZoneTransactionApi
 import `fun`.iiii.h2l.api.db.table.ProfileTable
-import `fun`.iiii.h2l.api.event.db.EntryTableSchemaAction
-import `fun`.iiii.h2l.api.event.db.EntryTableSchemaEvent
-import `fun`.iiii.h2l.api.event.db.EntryTableSchemaEventApi
+import `fun`.iiii.h2l.api.event.db.TableSchemaAction
+import `fun`.iiii.h2l.api.event.db.TableSchemaEvent
+import `fun`.iiii.h2l.api.event.db.TableSchemaEventApi
 import icu.h2l.login.auth.online.events.EntryRegisterEvent
 import org.jetbrains.exposed.sql.SchemaUtils
 import java.util.logging.Logger
@@ -22,7 +22,7 @@ class EntryTableManager(
     private val entryTables = mutableMapOf<String, EntryTable>()
 
     init {
-        EntryTableSchemaEventApi.registerListener(::onSchemaEvent)
+        TableSchemaEventApi.registerListener(::onSchemaEvent)
     }
 
     fun registerEntry(entryId: String): EntryTable {
@@ -55,10 +55,10 @@ class EntryTableManager(
         }
     }
 
-    private fun onSchemaEvent(event: EntryTableSchemaEvent) {
+    private fun onSchemaEvent(event: TableSchemaEvent) {
         when (event.action) {
-            EntryTableSchemaAction.CREATE_ALL -> createAllEntryTables()
-            EntryTableSchemaAction.DROP_ALL -> dropAllEntryTables()
+            TableSchemaAction.CREATE_ALL -> createAllEntryTables()
+            TableSchemaAction.DROP_ALL -> dropAllEntryTables()
         }
     }
 

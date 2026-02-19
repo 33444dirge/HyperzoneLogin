@@ -35,6 +35,7 @@ class HyperZoneLoginMain @Inject constructor(
     lateinit var limboServerManager: LimboAuth
     lateinit var databaseManager: icu.h2l.login.manager.DatabaseManager
 
+
     companion object {
         private lateinit var instance: HyperZoneLoginMain
         private lateinit var offlineMatchConfig: OfflineMatchConfig
@@ -84,8 +85,6 @@ class HyperZoneLoginMain @Inject constructor(
     val proxy: ProxyServer
         get() = server
 
-    fun getDataDirectoryPath(): Path = dataDirectory
-
     fun registerModule(moduleClassName: String) {
         try {
             val clazz = Class.forName(moduleClassName)
@@ -96,7 +95,7 @@ class HyperZoneLoginMain @Inject constructor(
                 return
             }
 
-            moduleInstance.register(this)
+            moduleInstance.register(this, proxy, dataDirectory, databaseManager)
             logger.info("模块加载成功: $moduleClassName")
         } catch (e: Exception) {
             logger.error("加载模块 $moduleClassName 失败: ${e.message}", e)

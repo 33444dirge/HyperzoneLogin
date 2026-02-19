@@ -1,6 +1,6 @@
 package icu.h2l.login.auth.online.db
 
-import icu.h2l.login.auth.online.DatabaseManager
+import `fun`.iiii.h2l.api.db.HyperZoneDatabaseManager
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
@@ -12,11 +12,12 @@ import java.util.logging.Logger
  * Entry 表数据操作帮助类
  */
 class EntryDatabaseHelper(
-    private val databaseManager: DatabaseManager,
+    private val databaseManager: HyperZoneDatabaseManager,
+    private val entryTableManager: EntryTableManager,
     private val logger: Logger
 ) {
     fun findEntryByNameAndUuid(entryId: String, name: String, uuid: UUID): UUID? {
-        val entryTable = databaseManager.getEntryTable(entryId) ?: return null
+        val entryTable = entryTableManager.getEntryTable(entryId) ?: return null
 
         return databaseManager.executeTransaction {
             entryTable.selectAll().where { (entryTable.name eq name) and (entryTable.uuid eq uuid) }
@@ -26,7 +27,7 @@ class EntryDatabaseHelper(
     }
 
     fun createEntry(entryId: String, name: String, uuid: UUID, pid: UUID): Boolean {
-        val entryTable = databaseManager.getEntryTable(entryId) ?: return false
+        val entryTable = entryTableManager.getEntryTable(entryId) ?: return false
 
         return try {
             databaseManager.executeTransaction {
@@ -44,7 +45,7 @@ class EntryDatabaseHelper(
     }
 
     fun updateEntryName(entryId: String, oldUuid: UUID, newName: String): Boolean {
-        val entryTable = databaseManager.getEntryTable(entryId) ?: return false
+        val entryTable = entryTableManager.getEntryTable(entryId) ?: return false
 
         return try {
             databaseManager.executeTransaction {
@@ -59,7 +60,7 @@ class EntryDatabaseHelper(
     }
 
     fun verifyEntry(entryId: String, name: String, uuid: UUID): Boolean {
-        val entryTable = databaseManager.getEntryTable(entryId) ?: return false
+        val entryTable = entryTableManager.getEntryTable(entryId) ?: return false
 
         return databaseManager.executeTransaction {
             entryTable.selectAll().where { (entryTable.name eq name) and (entryTable.uuid eq uuid) }.count() > 0
