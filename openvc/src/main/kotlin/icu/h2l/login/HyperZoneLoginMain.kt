@@ -6,9 +6,10 @@ import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
-import `fun`.iiii.h2l.api.event.db.TableSchemaAction
-import `fun`.iiii.h2l.api.event.db.TableSchemaEvent
-import `fun`.iiii.h2l.api.module.HyperSubModule
+import icu.h2l.api.event.db.TableSchemaAction
+import icu.h2l.api.event.db.TableSchemaEvent
+import icu.h2l.api.module.HyperSubModule
+import icu.h2l.login.auth.online.YggdrasilSubModule
 import icu.h2l.login.command.HyperZoneLoginCommand
 import icu.h2l.login.config.DatabaseSourceConfig
 import icu.h2l.login.config.OfflineMatchConfig
@@ -71,7 +72,7 @@ class HyperZoneLoginMain @Inject constructor(
         // 创建基础表（Profile 表等）
         createBaseTables()
 
-        registerModule("icu.h2l.login.auth.online.YggdrasilSubModule")
+        registerModule(YggdrasilSubModule())
 
 
         loginServerManager = LoginServerManager()
@@ -87,20 +88,12 @@ class HyperZoneLoginMain @Inject constructor(
     val proxy: ProxyServer
         get() = server
 
-    fun registerModule(moduleClassName: String) {
+    fun registerModule(module: HyperSubModule) {
         try {
-            val clazz = Class.forName(moduleClassName)
-            val moduleInstance = clazz.getDeclaredConstructor().newInstance()
-
-            if (moduleInstance !is HyperSubModule) {
-                logger.error("模块 $moduleClassName 未实现 HyperSubModule，跳过加载")
-                return
-            }
-
-            moduleInstance.register(this, proxy, dataDirectory, databaseManager)
-            logger.info("模块加载成功: $moduleClassName")
+            module.register(this, proxy, dataDirectory, databaseManager)
+            logger.info("模块加载成功: ${module.javaClass.name}")
         } catch (e: Exception) {
-            logger.error("加载模块 $moduleClassName 失败: ${e.message}", e)
+            logger.error("加载模块 ${module.javaClass.name} 失败: ${e.message}", e)
         }
     }
 

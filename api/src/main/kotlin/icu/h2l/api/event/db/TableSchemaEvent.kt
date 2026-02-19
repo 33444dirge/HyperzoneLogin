@@ -1,4 +1,4 @@
-package `fun`.iiii.h2l.api.event.db
+package icu.h2l.api.event.db
 
 enum class TableSchemaAction {
     CREATE_ALL,
@@ -6,5 +6,5 @@ enum class TableSchemaAction {
 }
 
 data class TableSchemaEvent(
-    val action: TableSchemaAction,
+    val action: icu.h2l.api.event.db.TableSchemaAction,
 )

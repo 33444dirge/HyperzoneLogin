@@ -4,12 +4,10 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":auth-yggd"))
     implementation(project(":api"))
     implementation(project(":vcinjector"))
-// limboAuth
-    implementation("at.favre.lib:bcrypt:0.9.0")
-    implementation("dev.samstevens.totp:totp:1.7.1")
-    implementation("de.mkammerer:argon2-jvm-nolibs:2.11")
+
 // Exposed ORM
     implementation("org.jetbrains.exposed:exposed-core:0.58.0")
     implementation("org.jetbrains.exposed:exposed-dao:0.58.0")
@@ -72,10 +70,6 @@ tasks {
             include(dependency("org.xerial:sqlite-jdbc"))
             include(dependency("mysql:mysql-connector-java"))
             include(dependency("com.zaxxer:HikariCP"))
-//            Authentication libraries
-            include(dependency("at.favre.lib:bcrypt"))
-            include(dependency("dev.samstevens.totp:totp"))
-            include(dependency("de.mkammerer:argon2-jvm-nolibs"))
 //           api
             include(dependency(":api"))
 //            模块

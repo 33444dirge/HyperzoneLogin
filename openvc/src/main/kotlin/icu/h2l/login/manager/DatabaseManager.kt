@@ -3,10 +3,10 @@ package icu.h2l.login.manager
 import com.velocitypowered.api.proxy.ProxyServer
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import `fun`.iiii.h2l.api.db.HyperZoneDatabaseManager
-import `fun`.iiii.h2l.api.db.table.ProfileTable
-import `fun`.iiii.h2l.api.event.db.TableSchemaAction
-import `fun`.iiii.h2l.api.event.db.TableSchemaEvent
+import icu.h2l.api.db.HyperZoneDatabaseManager
+import icu.h2l.api.db.table.ProfileTable
+import icu.h2l.api.event.db.TableSchemaAction
+import icu.h2l.api.event.db.TableSchemaEvent
 import icu.h2l.login.database.DatabaseConfig
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils

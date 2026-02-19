@@ -1,4 +1,4 @@
-package `fun`.iiii.h2l.api.db
+package icu.h2l.api.db
 
 interface HyperZoneDatabaseManager {
     val tablePrefix: String

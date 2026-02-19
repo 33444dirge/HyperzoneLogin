@@ -1,9 +1,9 @@
 package icu.h2l.login.auth.online
 
 import com.velocitypowered.api.proxy.ProxyServer
-import `fun`.iiii.h2l.api.db.HyperZoneDatabaseManager
-import `fun`.iiii.h2l.api.db.table.ProfileTable
-import `fun`.iiii.h2l.api.module.HyperSubModule
+import icu.h2l.api.db.HyperZoneDatabaseManager
+import icu.h2l.api.db.table.ProfileTable
+import icu.h2l.api.module.HyperSubModule
 import icu.h2l.login.auth.online.db.EntryTableManager
 import icu.h2l.login.auth.online.manager.EntryConfigManager
 import java.util.logging.Logger

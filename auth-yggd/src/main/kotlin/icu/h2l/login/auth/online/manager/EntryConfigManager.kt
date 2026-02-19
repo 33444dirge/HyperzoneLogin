@@ -1,9 +1,9 @@
 package icu.h2l.login.auth.online.manager
 
 import com.velocitypowered.api.proxy.ProxyServer
-import `fun`.iiii.h2l.api.log.debug
-import `fun`.iiii.h2l.api.log.error
-import `fun`.iiii.h2l.api.log.info
+import icu.h2l.api.log.debug
+import icu.h2l.api.log.error
+import icu.h2l.api.log.info
 import icu.h2l.login.auth.online.config.entry.EntryConfig
 import icu.h2l.login.auth.online.events.EntryRegisterEvent
 import org.spongepowered.configurate.ConfigurationOptions

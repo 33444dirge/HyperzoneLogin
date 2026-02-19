@@ -202,7 +202,7 @@ public class MixinInitialLoginSessionHandler {
                             cState = 2;
 //                            this.currentState = InitialLoginSessionHandler.LoginState.ENCRYPTION_REQUEST_SENT;
                         } else {
-                            doLogin(false, null, null);
+                            doLogin(false, "", null);
                         }
 
                     }).exceptionally((ex) -> {

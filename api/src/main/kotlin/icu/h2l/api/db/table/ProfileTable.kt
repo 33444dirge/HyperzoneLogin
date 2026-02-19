@@ -1,4 +1,4 @@
-package `fun`.iiii.h2l.api.db.table
+package icu.h2l.api.db.table
 
 import org.jetbrains.exposed.sql.Table
 

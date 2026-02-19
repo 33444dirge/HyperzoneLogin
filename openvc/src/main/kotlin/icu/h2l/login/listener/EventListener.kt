@@ -1,8 +1,8 @@
 package icu.h2l.login.listener
 
 import com.velocitypowered.api.event.Subscribe
-import `fun`.iiii.h2l.api.event.connection.OnlineAuthEvent
-import `fun`.iiii.h2l.api.event.connection.OpenPreLoginEvent
+import icu.h2l.api.event.connection.OnlineAuthEvent
+import icu.h2l.api.event.connection.OpenPreLoginEvent
 import icu.h2l.login.HyperZoneLoginMain
 import icu.h2l.login.type.OfflineUUIDType
 import icu.h2l.login.util.ExtraUuidUtils

@@ -1,4 +1,4 @@
-package `fun`.iiii.h2l.api.log
+package icu.h2l.api.log
 
 interface HyperZoneLogger {
     fun info(message: String)
@@ -9,18 +9,18 @@ interface HyperZoneLogger {
 
 object HyperZoneLogApi {
     @Volatile
-    private var logger: HyperZoneLogger = NoopHyperZoneLogger
+    private var logger: icu.h2l.api.log.HyperZoneLogger = _root_ide_package_.icu.h2l.api.log.NoopHyperZoneLogger
 
     @JvmStatic
-    fun registerLogger(newLogger: HyperZoneLogger) {
+    fun registerLogger(newLogger: icu.h2l.api.log.HyperZoneLogger) {
         logger = newLogger
     }
 
     @JvmStatic
-    fun getLogger(): HyperZoneLogger = logger
+    fun getLogger(): icu.h2l.api.log.HyperZoneLogger = logger
 }
 
-private object NoopHyperZoneLogger : HyperZoneLogger {
+private object NoopHyperZoneLogger : icu.h2l.api.log.HyperZoneLogger {
     override fun info(message: String) = Unit
     override fun debug(message: String) = Unit
     override fun warn(message: String) = Unit
@@ -28,17 +28,17 @@ private object NoopHyperZoneLogger : HyperZoneLogger {
 }
 
 inline fun info(block: () -> String) {
-    HyperZoneLogApi.getLogger().info(block())
+    _root_ide_package_.icu.h2l.api.log.HyperZoneLogApi.getLogger().info(block())
 }
 
 inline fun debug(block: () -> String) {
-    HyperZoneLogApi.getLogger().debug(block())
+    _root_ide_package_.icu.h2l.api.log.HyperZoneLogApi.getLogger().debug(block())
 }
 
 inline fun warn(block: () -> String) {
-    HyperZoneLogApi.getLogger().warn(block())
+    _root_ide_package_.icu.h2l.api.log.HyperZoneLogApi.getLogger().warn(block())
 }
 
 inline fun error(throwable: Throwable? = null, block: () -> String) {
-    HyperZoneLogApi.getLogger().error(block(), throwable)
+    _root_ide_package_.icu.h2l.api.log.HyperZoneLogApi.getLogger().error(block(), throwable)
 }

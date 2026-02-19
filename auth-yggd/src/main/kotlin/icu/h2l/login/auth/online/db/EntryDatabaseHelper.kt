@@ -1,6 +1,6 @@
 package icu.h2l.login.auth.online.db
 
-import `fun`.iiii.h2l.api.db.HyperZoneDatabaseManager
+import icu.h2l.api.db.HyperZoneDatabaseManager
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll

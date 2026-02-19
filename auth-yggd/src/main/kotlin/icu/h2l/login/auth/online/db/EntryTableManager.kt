@@ -1,10 +1,10 @@
 package icu.h2l.login.auth.online.db
 
 import com.velocitypowered.api.event.Subscribe
-import `fun`.iiii.h2l.api.db.HyperZoneDatabaseManager
-import `fun`.iiii.h2l.api.db.table.ProfileTable
-import `fun`.iiii.h2l.api.event.db.TableSchemaAction
-import `fun`.iiii.h2l.api.event.db.TableSchemaEvent
+import icu.h2l.api.db.HyperZoneDatabaseManager
+import icu.h2l.api.db.table.ProfileTable
+import icu.h2l.api.event.db.TableSchemaAction
+import icu.h2l.api.event.db.TableSchemaEvent
 import icu.h2l.login.auth.online.events.EntryRegisterEvent
 import org.jetbrains.exposed.sql.SchemaUtils
 import java.util.logging.Logger

@@ -2,10 +2,10 @@ package icu.h2l.login.auth.online
 
 import com.velocitypowered.api.util.GameProfile
 import com.velocitypowered.proxy.VelocityServer
-import `fun`.iiii.h2l.api.db.HyperZoneDatabaseManager
-import `fun`.iiii.h2l.api.limbo.handler.LimboAuthSessionOverVerify
-import `fun`.iiii.h2l.api.log.debug
-import `fun`.iiii.h2l.api.log.info
+import icu.h2l.api.db.HyperZoneDatabaseManager
+import icu.h2l.api.limbo.handler.LimboAuthSessionOverVerify
+import icu.h2l.api.log.debug
+import icu.h2l.api.log.info
 import icu.h2l.login.auth.online.config.entry.EntryConfig
 import icu.h2l.login.auth.online.db.EntryTableManager
 import icu.h2l.login.auth.online.manager.EntryConfigManager
@@ -32,7 +32,7 @@ import kotlin.or
  */
 class YggdrasilAuthModule(
     private val entryConfigManager: EntryConfigManager,
-    private val databaseManager: HyperZoneDatabaseManager,
+    private val databaseManager: icu.h2l.api.db.HyperZoneDatabaseManager,
     private val entryTableManager: EntryTableManager
 ) {
     private val httpClient: HttpClient = HttpClient.newBuilder()
@@ -67,7 +67,7 @@ class YggdrasilAuthModule(
      * Key: 玩家用户名
      * Value: LimboAuthSessionHandler实例
      */
-    private val limboHandlers = ConcurrentHashMap<String, LimboAuthSessionOverVerify>()
+    private val limboHandlers = ConcurrentHashMap<String, icu.h2l.api.limbo.handler.LimboAuthSessionOverVerify>()
 
     /**
      * 协程作用域

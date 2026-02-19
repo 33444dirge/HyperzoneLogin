@@ -30,13 +30,13 @@ public final class ApiEventReflector {
 
             try {
                 Class<?> openPreLoginEventClass = PluginClassLoaderReflector.loadClassFromLoaders(
-                        "fun.iiii.h2l.api.event.connection.OpenPreLoginEvent"
+                        "icu.h2l.api.event.connection.OpenPreLoginEvent"
                 );
                 openPreLoginEventCtor = openPreLoginEventClass.getConstructor(UUID.class, String.class, String.class);
                 openPreLoginEventIsOnline = openPreLoginEventClass.getMethod("isOnline");
 
                 Class<?> onlineAuthEventClass = PluginClassLoaderReflector.loadClassFromLoaders(
-                        "fun.iiii.h2l.api.event.connection.OnlineAuthEvent"
+                        "icu.h2l.api.event.connection.OnlineAuthEvent"
                 );
                 onlineAuthEventCtor = onlineAuthEventClass.getConstructor(
                         String.class,

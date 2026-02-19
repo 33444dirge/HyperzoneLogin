@@ -1,7 +1,7 @@
 package icu.h2l.login.limbo.handler
 
 import com.velocitypowered.api.proxy.Player
-import `fun`.iiii.h2l.api.limbo.handler.LimboAuthSessionOverVerify
+import icu.h2l.api.limbo.handler.LimboAuthSessionOverVerify
 import net.elytrium.limboapi.api.Limbo
 import net.elytrium.limboapi.api.LimboSessionHandler
 import net.elytrium.limboapi.api.player.LimboPlayer

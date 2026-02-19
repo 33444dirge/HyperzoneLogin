@@ -1,4 +1,4 @@
-package `fun`.iiii.h2l.api.limbo.handler
+package icu.h2l.api.limbo.handler
 
 import net.kyori.adventure.text.Component
 

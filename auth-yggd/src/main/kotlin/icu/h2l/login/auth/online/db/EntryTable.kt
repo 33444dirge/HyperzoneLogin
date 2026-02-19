@@ -1,6 +1,6 @@
 package icu.h2l.login.auth.online.db
 
-import `fun`.iiii.h2l.api.db.table.ProfileTable
+import icu.h2l.api.db.table.ProfileTable
 import org.jetbrains.exposed.sql.Table
 
 /**
