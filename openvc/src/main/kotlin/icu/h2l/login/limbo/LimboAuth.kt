@@ -12,6 +12,7 @@ import net.elytrium.limboapi.api.chunk.Dimension
 import net.elytrium.limboapi.api.chunk.VirtualWorld
 import net.elytrium.limboapi.api.event.LoginLimboRegisterEvent
 import net.elytrium.limboapi.api.player.GameMode
+
 //用于注册到limbo服务器，不需要融合于任何模块目前
 class LimboAuth(server: ProxyServer) {
     private val factory: LimboFactory
@@ -40,15 +41,10 @@ class LimboAuth(server: ProxyServer) {
     // 依靠GameProfileRequestEvent，到这里我们的验证早就结束了，这里的onlineMode应该是正确的
     @Subscribe
     fun onLoginLimboRegister(event: LoginLimboRegisterEvent) {
-        // 在线额外特判
+        // 在线额外特判，先不做，理论上不会验证这么快
         if (event.player.isOnlineMode) {
-            val authManager = HyperZoneLoginMain.getInstance().yggdrasilAuthModule
-            val handler = authManager.getLimboHandler(event.player.username)
+//            在这里添加一个LoginLimboOnlineEvent事件，用于返回是否跳过，跳过则直接return
 
-            // 如果handler已经完成over验证，直接跳过登入流程
-            if (handler != null && handler.isOverVerified()) {
-                return
-            }
         }
 
         // 必须callBack
@@ -56,18 +52,8 @@ class LimboAuth(server: ProxyServer) {
     }
 
     fun authPlayer(player: Player) {
-        // this.factory.passLoginLimbo(player)
-        val authManager = HyperZoneLoginMain.getInstance().yggdrasilAuthModule
-        val handler = authManager.getLimboHandler(player.username)
-
-        if (handler != null) {
-            // 从AuthManager中获取已注册的handler
-            authServer.spawnPlayer(player, handler)
-        } else {
-            // 如果没有找到，创建新的handler并注册
-            val newHandler = LimboAuthSessionHandler(player)
-            authManager.registerLimboHandler(player.username, newHandler)
-            authServer.spawnPlayer(player, newHandler)
-        }
+        // this.factory.passLoginLimbo(player) 这是跳过方法
+        val newHandler = LimboAuthSessionHandler(player)
+        authServer.spawnPlayer(player, newHandler)
     }
 }

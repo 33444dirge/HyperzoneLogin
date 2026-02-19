@@ -1,6 +1,7 @@
 package icu.h2l.login.limbo.handler
 
 import com.velocitypowered.api.proxy.Player
+import `fun`.iiii.h2l.api.limbo.handler.LimboAuthSessionOverVerify
 import net.elytrium.limboapi.api.Limbo
 import net.elytrium.limboapi.api.LimboSessionHandler
 import net.elytrium.limboapi.api.player.LimboPlayer
@@ -8,7 +9,7 @@ import net.kyori.adventure.text.Component
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 
-class LimboAuthSessionHandler(private val proxyPlayer: Player) : LimboSessionHandler {
+class LimboAuthSessionHandler(private val proxyPlayer: Player) : LimboSessionHandler, LimboAuthSessionOverVerify {
     private lateinit var player: LimboPlayer
 
     /**
@@ -42,7 +43,7 @@ class LimboAuthSessionHandler(private val proxyPlayer: Player) : LimboSessionHan
      * 完成验证，结束Limbo状态
      * 此方法由AuthManager在Yggdrasil验证成功时调用
      */
-    fun overVerify() {
+    override fun overVerify() {
         if (isOverVerified.compareAndSet(false, true)) {
             // 只执行一次
             if (::player.isInitialized) {
@@ -54,7 +55,7 @@ class LimboAuthSessionHandler(private val proxyPlayer: Player) : LimboSessionHan
     /**
      * 检查是否已经完成over验证
      */
-    fun isOverVerified(): Boolean {
+    override fun isOverVerified(): Boolean {
         return isOverVerified.get()
     }
 
@@ -64,7 +65,7 @@ class LimboAuthSessionHandler(private val proxyPlayer: Player) : LimboSessionHan
      * 
      * @param message 要发送的消息
      */
-    fun sendMessage(message: Component) {
+    override fun sendMessage(message: Component) {
         if (hasSpawned.get() && ::player.isInitialized) {
             // 玩家已spawn，直接发送
             proxyPlayer.sendMessage(message)

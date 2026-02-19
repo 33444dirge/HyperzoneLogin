@@ -1,8 +1,7 @@
 package icu.h2l.login.auth.online.db
 
+import `fun`.iiii.h2l.api.db.table.ProfileTable
 import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.javatime.timestamp
-import java.time.Instant
 
 /**
  * 入口表基类

@@ -2,18 +2,16 @@ package icu.h2l.login.auth.online
 
 import com.velocitypowered.api.util.GameProfile
 import com.velocitypowered.proxy.VelocityServer
+import `fun`.iiii.h2l.api.limbo.handler.LimboAuthSessionOverVerify
 import `fun`.iiii.h2l.api.log.debug
 import `fun`.iiii.h2l.api.log.info
+import icu.h2l.login.auth.online.config.entry.EntryConfig
 import icu.h2l.login.auth.online.manager.EntryConfigManager
 import icu.h2l.login.auth.online.req.AuthServerConfig
 import icu.h2l.login.auth.online.req.AuthenticationRequest
 import icu.h2l.login.auth.online.req.AuthenticationResult
 import icu.h2l.login.auth.online.req.ConcurrentAuthenticationManager
 import icu.h2l.login.auth.online.req.MojangStyleAuthRequest
-import icu.h2l.login.config.entry.EntryConfig
-import icu.h2l.login.limbo.handler.LimboAuthSessionHandler
-import icu.h2l.login.manager.DatabaseManager
-import icu.h2l.login.manager.EntryConfigManager
 import kotlinx.coroutines.*
 import net.kyori.adventure.text.Component
 import org.jetbrains.exposed.sql.or
@@ -66,7 +64,7 @@ class YggdrasilAuthModule(
      * Key: 玩家用户名
      * Value: LimboAuthSessionHandler实例
      */
-    private val limboHandlers = ConcurrentHashMap<String, LimboAuthSessionHandler>()
+    private val limboHandlers = ConcurrentHashMap<String, LimboAuthSessionOverVerify>()
 
     /**
      * 协程作用域
@@ -120,7 +118,7 @@ class YggdrasilAuthModule(
      * @param username 玩家用户名
      * @param handler LimboAuthSessionHandler实例
      */
-    fun registerLimboHandler(username: String, handler: LimboAuthSessionHandler) {
+    fun registerLimboHandler(username: String, handler: LimboAuthSessionOverVerify) {
         limboHandlers[username] = handler
         debug { "为玩家 $username 注册 LimboAuthSessionHandler" }
     }
@@ -131,7 +129,7 @@ class YggdrasilAuthModule(
      * @param username 玩家用户名
      * @return LimboAuthSessionHandler实例，如果未注册则返回null
      */
-    fun getLimboHandler(username: String): LimboAuthSessionHandler? {
+    fun getLimboHandler(username: String): LimboAuthSessionOverVerify? {
         return limboHandlers[username]
     }
 
