@@ -24,6 +24,8 @@ class YggdrasilEventListener(
 
     @Subscribe
     fun onLimboSpawn(event: LimboSpawnEvent) {
+        if (!event.proxyPlayer.isOnlineMode) return
+
         val username = event.proxyPlayer.username
         debug { "[YggdrasilFlow] LimboSpawnEvent 收到，注册回调: user=$username" }
         yggdrasilAuthModule.registerLimboHandler(username, event.sessionOverVerify)

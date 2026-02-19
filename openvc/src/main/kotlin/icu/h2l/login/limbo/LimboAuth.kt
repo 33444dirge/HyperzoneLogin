@@ -41,12 +41,6 @@ class LimboAuth(server: ProxyServer) {
     // 依靠GameProfileRequestEvent，到这里我们的验证早就结束了，这里的onlineMode应该是正确的
     @Subscribe
     fun onLoginLimboRegister(event: LoginLimboRegisterEvent) {
-        // 在线额外特判，先不做，理论上不会验证这么快
-        if (event.player.isOnlineMode) {
-//            在这里添加一个LoginLimboOnlineEvent事件，用于返回是否跳过，跳过则直接return
-
-        }
-
         // 必须callBack
         event.addOnJoinCallback { authPlayer(event.player) }
     }
