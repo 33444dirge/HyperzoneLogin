@@ -80,6 +80,10 @@ class OpenVcHyperZonePlayer(
         }
     }
 
+    fun exitLimbo() {
+        limboPlayer?.disconnect()
+    }
+
     override fun sendMessage(message: Component) {
         if (hasSpawned.get()) {
             proxyPlayer.sendMessage(message)

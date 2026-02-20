@@ -29,7 +29,7 @@ class LimboAuth(server: ProxyServer) : HyperZoneLimbo {
 
     fun load() {
         val authWorld: VirtualWorld = factory.createVirtualWorld(
-            Dimension.THE_END,
+            Dimension.OVERWORLD,
             0.0, 0.0, 0.0,
             0f, 0f
         )

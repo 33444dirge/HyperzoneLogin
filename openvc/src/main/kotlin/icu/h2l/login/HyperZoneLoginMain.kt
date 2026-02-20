@@ -10,6 +10,7 @@ import icu.h2l.api.event.db.TableSchemaAction
 import icu.h2l.api.event.db.TableSchemaEvent
 import icu.h2l.api.command.HyperChatCommandManager
 import icu.h2l.api.command.HyperChatCommandManagerProvider
+import icu.h2l.api.command.HyperChatCommandRegistration
 import icu.h2l.api.limbo.HyperZoneLimbo
 import icu.h2l.api.limbo.HyperZoneLimboProvider
 import icu.h2l.api.module.HyperSubModule
@@ -25,6 +26,7 @@ import icu.h2l.login.database.DatabaseConfig
 import icu.h2l.login.database.DatabaseHelper
 import icu.h2l.login.inject.network.VelocityNetworkModule
 import icu.h2l.login.limbo.LimboAuth
+import icu.h2l.login.limbo.command.ExitLimboCommand
 import icu.h2l.login.util.registerApiLogger
 import icu.h2l.login.listener.EventListener
 import icu.h2l.login.manager.HyperChatCommandManagerImpl
@@ -94,6 +96,13 @@ class HyperZoneLoginMain @Inject constructor(
         limboServerManager = LimboAuth(server)
         limboServerManager.load()
         HyperChatCommandManagerImpl.bindLimbo(proxy, limboServerManager.authServer)
+
+        chatCommandManager.register(
+            HyperChatCommandRegistration(
+                name = "exit",
+                command = ExitLimboCommand()
+            )
+        )
 
 //        最后加载模块
         registerModule(VelocityNetworkModule())
