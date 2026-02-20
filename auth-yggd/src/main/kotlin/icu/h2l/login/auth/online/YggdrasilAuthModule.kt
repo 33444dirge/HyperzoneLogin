@@ -6,6 +6,7 @@ import icu.h2l.api.db.HyperZoneDatabaseManager
 import icu.h2l.api.log.debug
 import icu.h2l.api.log.info
 import icu.h2l.api.player.HyperZonePlayer
+import icu.h2l.api.player.HyperZonePlayerAccessor
 import icu.h2l.login.auth.online.config.entry.EntryConfig
 import icu.h2l.login.auth.online.db.EntryDatabaseHelper
 import icu.h2l.login.auth.online.db.EntryTableManager
@@ -35,7 +36,8 @@ import kotlin.or
 class YggdrasilAuthModule(
     private val entryConfigManager: EntryConfigManager,
     private val databaseManager: icu.h2l.api.db.HyperZoneDatabaseManager,
-    private val entryTableManager: EntryTableManager
+    private val entryTableManager: EntryTableManager,
+    private val playerAccessor: HyperZonePlayerAccessor
 ) {
     private val httpClient: HttpClient = HttpClient.newBuilder()
         .connectTimeout(Duration.ofSeconds(5))
@@ -195,18 +197,36 @@ class YggdrasilAuthModule(
                 return
             }
 
+            val failureReason = when (result) {
+                is YggdrasilAuthResult.Failed -> result.reason
+                is YggdrasilAuthResult.Timeout -> "Timeout"
+                is YggdrasilAuthResult.NoServersConfigured -> "No servers configured"
+                is YggdrasilAuthResult.PendingSecondBatch -> "Pending second batch"
+                else -> "Unknown"
+            }
             handler.sendMessage(Component.text("玩家 $username Yggdrasil 验证失败"))
             info { "玩家 $username Yggdrasil 验证失败" }
+            debug { "玩家 $username Yggdrasil 验证失败原因: $failureReason" }
         } finally {
             clearTransientStateAfterDispatch(username)
         }
     }
 
     private fun clearTransientStateAfterDispatch(username: String) {
+        clearTransientState(username)
+        debug { "[YggdrasilFlow] 回调完成后已清理临时状态: user=$username" }
+    }
+
+    private fun clearTransientState(username: String) {
         authResults.remove(username)
         limboHandlers.remove(username)
+        pendingSecondBatch.remove(username)
         inFlightAuthJobs.remove(username)?.cancel()
-        debug { "[YggdrasilFlow] 回调完成后已清理临时状态: user=$username" }
+    }
+
+    fun clearPlayerCacheOnDisconnect(username: String) {
+        clearTransientState(username)
+        debug { "[YggdrasilFlow] 玩家断连，已清理缓存状态: user=$username" }
     }
 
     /**（内部方法，由startYggdrasilAuth调用）
@@ -246,7 +266,13 @@ class YggdrasilAuthModule(
                 )
 
                 if (firstBatchResult.isSuccess) {
+                    val firstBatchValidation = validateFirstBatchProfile(username, uuid, firstBatchResult)
+                    if (firstBatchValidation != null) {
+                        return@runBlocking firstBatchValidation
+                    }
                     return@runBlocking firstBatchResult
+                } else {
+                    notifyFirstBatchFailure(username, firstBatchResult)
                 }
             }
         }
@@ -256,6 +282,47 @@ class YggdrasilAuthModule(
         // 第二批次：向所有Yggdrasil服务器发起请求
         pendingSecondBatch[username] = PendingSecondBatchData(username, uuid, serverId, playerIp)
         YggdrasilAuthResult.PendingSecondBatch
+    }
+
+    private fun validateFirstBatchProfile(
+        username: String,
+        uuid: UUID,
+        result: YggdrasilAuthResult
+    ): YggdrasilAuthResult? {
+        val success = result as? YggdrasilAuthResult.Success ?: return null
+
+        val hyperZonePlayer = playerAccessor.getByNameOrUuid(username, uuid)
+            ?: return YggdrasilAuthResult.Failed("第一批次验证失败：未获取到玩家实例")
+
+        val playerProfile = hyperZonePlayer.getProfile()
+            ?: return YggdrasilAuthResult.Failed("第一批次验证失败：未获取到玩家 Profile")
+
+        val entryProfileId = entryDatabaseHelper.findEntryByNameAndUuid(
+            entryId = success.entryId,
+            name = username,
+            uuid = uuid
+        ) ?: return YggdrasilAuthResult.Failed("第一批次验证失败：未获取到 Entry Profile")
+
+        if (playerProfile.id == entryProfileId) {
+            return null
+        }
+
+        return YggdrasilAuthResult.Failed("第一批次验证失败：玩家 Profile 与 Entry Profile 不一致")
+    }
+
+    private fun notifyFirstBatchFailure(username: String, result: YggdrasilAuthResult) {
+        val handler = limboHandlers[username] ?: return
+
+        val message = when (result) {
+            is YggdrasilAuthResult.Failed -> {
+                val status = result.statusCode?.let { " (HTTP $it)" } ?: ""
+                "第一批次验证失败: ${result.reason}$status"
+            }
+            is YggdrasilAuthResult.Timeout -> "第一批次验证超时"
+            else -> return
+        }
+
+        handler.sendMessage(Component.text(message))
     }
 
     private suspend fun runSecondBatchAuth(

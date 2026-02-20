@@ -4,6 +4,7 @@ import com.velocitypowered.api.proxy.ProxyServer
 import icu.h2l.api.db.HyperZoneDatabaseManager
 import icu.h2l.api.db.table.ProfileTable
 import icu.h2l.api.module.HyperSubModule
+import icu.h2l.api.player.HyperZonePlayerAccessorProvider
 import icu.h2l.login.auth.online.db.EntryTableManager
 import icu.h2l.login.auth.online.manager.EntryConfigManager
 import java.util.logging.Logger
@@ -20,6 +21,9 @@ class YggdrasilSubModule : HyperSubModule {
         dataDirectory: Path,
         databaseManager: HyperZoneDatabaseManager
     ) {
+        val playerAccessorProvider = owner as? HyperZonePlayerAccessorProvider
+            ?: throw IllegalStateException("YggdrasilSubModule requires HyperZonePlayerAccessorProvider owner")
+
         val entryConfigManager = EntryConfigManager(dataDirectory, proxy)
         val entryTableManager = EntryTableManager(
             logger = Logger.getLogger("HyperZoneLogin-AuthYggd"),
@@ -36,7 +40,8 @@ class YggdrasilSubModule : HyperSubModule {
         val yggdrasilAuthModule = YggdrasilAuthModule(
             entryConfigManager = entryConfigManager,
             databaseManager = databaseManager,
-            entryTableManager = entryTableManager
+            entryTableManager = entryTableManager,
+            playerAccessor = playerAccessorProvider.hyperZonePlayers
         )
         val yggdrasilEventListener = YggdrasilEventListener(yggdrasilAuthModule)
 
