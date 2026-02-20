@@ -8,6 +8,8 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import icu.h2l.api.event.db.TableSchemaAction
 import icu.h2l.api.event.db.TableSchemaEvent
+import icu.h2l.api.command.HyperChatCommandManager
+import icu.h2l.api.command.HyperChatCommandManagerProvider
 import icu.h2l.api.limbo.HyperZoneLimbo
 import icu.h2l.api.limbo.HyperZoneLimboProvider
 import icu.h2l.api.module.HyperSubModule
@@ -25,6 +27,7 @@ import icu.h2l.login.inject.network.VelocityNetworkModule
 import icu.h2l.login.limbo.LimboAuth
 import icu.h2l.login.util.registerApiLogger
 import icu.h2l.login.listener.EventListener
+import icu.h2l.login.manager.HyperChatCommandManagerImpl
 import icu.h2l.login.manager.HyperZonePlayerManager
 import icu.h2l.login.manager.LoginServerManager
 import java.nio.file.Files
@@ -41,7 +44,7 @@ class HyperZoneLoginMain @Inject constructor(
     val logger: ComponentLogger,
     @DataDirectory private val dataDirectory: Path,
     private val injector: Injector
-) : HyperZoneLimboProvider, HyperZonePlayerAccessorProvider {
+) : HyperZoneLimboProvider, HyperZonePlayerAccessorProvider, HyperChatCommandManagerProvider {
     lateinit var loginServerManager: LoginServerManager
     lateinit var limboServerManager: LimboAuth
     lateinit var databaseManager: icu.h2l.login.manager.DatabaseManager
@@ -50,6 +53,8 @@ class HyperZoneLoginMain @Inject constructor(
         get() = limboServerManager
     override val hyperZonePlayers: HyperZonePlayerAccessor
         get() = HyperZonePlayerManager
+    override val chatCommandManager: HyperChatCommandManager
+        get() = HyperChatCommandManagerImpl
 
 
     companion object {
@@ -88,6 +93,7 @@ class HyperZoneLoginMain @Inject constructor(
         loginServerManager = LoginServerManager()
         limboServerManager = LimboAuth(server)
         limboServerManager.load()
+        HyperChatCommandManagerImpl.bindLimbo(proxy, limboServerManager.authServer)
 
 //        最后加载模块
         registerModule(VelocityNetworkModule())

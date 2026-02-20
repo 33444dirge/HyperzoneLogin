@@ -20,4 +20,9 @@ class LimboAuthSessionHandler(
         )
         player.disableFalling()
     }
+
+    override fun onChat(chat: String?) {
+        val input = chat ?: return
+        HyperZoneLoginMain.getInstance().chatCommandManager.executeChat(proxyPlayer, input)
+    }
 }

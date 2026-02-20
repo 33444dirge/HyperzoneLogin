@@ -7,7 +7,7 @@ import net.kyori.adventure.text.Component
 
 class LoginCommand(
 	private val playerAccessor: HyperZonePlayerAccessor
-) : BasePlaceholderAuthCommand("/login <password>") {
+	) : BasePlaceholderAuthCommand("/login <password>") {
 	override fun execute(invocation: SimpleCommand.Invocation) {
 		val source = invocation.source()
 		if (source !is Player) {

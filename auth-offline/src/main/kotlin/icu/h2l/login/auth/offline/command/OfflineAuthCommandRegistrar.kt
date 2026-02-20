@@ -1,30 +1,47 @@
 package icu.h2l.login.auth.offline.command
 
-import com.velocitypowered.api.proxy.ProxyServer
+import icu.h2l.api.command.HyperChatCommandManager
+import icu.h2l.api.command.HyperChatCommandRegistration
 import icu.h2l.api.player.HyperZonePlayerAccessor
-import net.elytrium.limboapi.api.Limbo
 
 object OfflineAuthCommandRegistrar {
-    fun registerAll(proxy: ProxyServer, authServer: Limbo, playerAccessor: HyperZonePlayerAccessor) {
-        authServer.registerCommand(
-            proxy.commandManager.metaBuilder("login").aliases("l").build(),
-            LoginCommand(playerAccessor)
+    fun registerAll(
+        commandManager: HyperChatCommandManager,
+        playerAccessor: HyperZonePlayerAccessor
+    ) {
+        commandManager.register(
+            HyperChatCommandRegistration(
+                name = "login",
+                aliases = setOf("l"),
+                command = LoginCommand(playerAccessor)
+            )
         )
-        authServer.registerCommand(
-            proxy.commandManager.metaBuilder("register").aliases("reg").build(),
-            RegisterCommand()
+        commandManager.register(
+            HyperChatCommandRegistration(
+                name = "register",
+                aliases = setOf("reg"),
+                command = RegisterCommand()
+            )
         )
-        authServer.registerCommand(
-            proxy.commandManager.metaBuilder("changepassword").aliases("cpass", "changepass").build(),
-            ChangePasswordCommand()
+        commandManager.register(
+            HyperChatCommandRegistration(
+                name = "changepassword",
+                aliases = setOf("cpass", "changepass"),
+                command = ChangePasswordCommand()
+            )
         )
-        authServer.registerCommand(
-            proxy.commandManager.metaBuilder("logout").build(),
-            LogoutCommand()
+        commandManager.register(
+            HyperChatCommandRegistration(
+                name = "logout",
+                command = LogoutCommand()
+            )
         )
-        authServer.registerCommand(
-            proxy.commandManager.metaBuilder("unregister").aliases("delaccount").build(),
-            UnregisterCommand()
+        commandManager.register(
+            HyperChatCommandRegistration(
+                name = "unregister",
+                aliases = setOf("delaccount"),
+                command = UnregisterCommand()
+            )
         )
     }
 }
