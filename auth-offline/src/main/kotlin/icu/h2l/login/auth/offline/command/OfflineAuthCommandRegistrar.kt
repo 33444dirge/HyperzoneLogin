@@ -2,32 +2,32 @@ package icu.h2l.login.auth.offline.command
 
 import icu.h2l.api.command.HyperChatCommandManager
 import icu.h2l.api.command.HyperChatCommandRegistration
-import icu.h2l.api.player.HyperZonePlayerAccessor
+import icu.h2l.login.auth.offline.service.OfflineAuthService
 
 object OfflineAuthCommandRegistrar {
     fun registerAll(
         commandManager: HyperChatCommandManager,
-        playerAccessor: HyperZonePlayerAccessor
+        authService: OfflineAuthService
     ) {
         commandManager.register(
             HyperChatCommandRegistration(
                 name = "login",
                 aliases = setOf("l"),
-                command = LoginCommand(playerAccessor)
+                command = LoginCommand(authService)
             )
         )
         commandManager.register(
             HyperChatCommandRegistration(
                 name = "register",
                 aliases = setOf("reg"),
-                command = RegisterCommand()
+                command = RegisterCommand(authService)
             )
         )
         commandManager.register(
             HyperChatCommandRegistration(
                 name = "changepassword",
                 aliases = setOf("cpass", "changepass"),
-                command = ChangePasswordCommand()
+                command = ChangePasswordCommand(authService)
             )
         )
         commandManager.register(
@@ -40,7 +40,7 @@ object OfflineAuthCommandRegistrar {
             HyperChatCommandRegistration(
                 name = "unregister",
                 aliases = setOf("delaccount"),
-                command = UnregisterCommand()
+                command = UnregisterCommand(authService)
             )
         )
     }

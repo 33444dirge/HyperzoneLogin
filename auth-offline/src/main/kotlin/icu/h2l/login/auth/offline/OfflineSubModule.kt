@@ -5,11 +5,19 @@ import icu.h2l.api.command.HyperChatCommandManagerProvider
 import icu.h2l.api.db.HyperZoneDatabaseManager
 import icu.h2l.api.module.HyperSubModule
 import icu.h2l.api.player.HyperZonePlayerAccessorProvider
+import icu.h2l.api.db.table.ProfileTable
 import icu.h2l.login.auth.offline.command.OfflineAuthCommandRegistrar
+import icu.h2l.login.auth.offline.db.OfflineAuthRepository
+import icu.h2l.login.auth.offline.db.OfflineAuthTableManager
+import icu.h2l.login.auth.offline.service.OfflineAuthService
 import java.nio.file.Path
 import java.util.logging.Logger
 
 class OfflineSubModule : HyperSubModule {
+    lateinit var offlineAuthTableManager: OfflineAuthTableManager
+    lateinit var offlineAuthRepository: OfflineAuthRepository
+    lateinit var offlineAuthService: OfflineAuthService
+
     override fun register(
         owner: Any,
         proxy: ProxyServer,
@@ -21,9 +29,28 @@ class OfflineSubModule : HyperSubModule {
         val playerAccessorProvider = owner as? HyperZonePlayerAccessorProvider
             ?: throw IllegalStateException("OfflineSubModule requires HyperZonePlayerAccessorProvider owner")
 
+        val profileTable = ProfileTable(databaseManager.tablePrefix)
+        offlineAuthTableManager = OfflineAuthTableManager(
+            logger = Logger.getLogger("HyperZoneLogin-AuthOffline"),
+            databaseManager = databaseManager,
+            tablePrefix = databaseManager.tablePrefix,
+            profileTable = profileTable
+        )
+        offlineAuthRepository = OfflineAuthRepository(
+            databaseManager = databaseManager,
+            table = offlineAuthTableManager.offlineAuthTable,
+            logger = Logger.getLogger("HyperZoneLogin-AuthOffline")
+        )
+        offlineAuthService = OfflineAuthService(
+            repository = offlineAuthRepository,
+            playerAccessor = playerAccessorProvider.hyperZonePlayers
+        )
+        offlineAuthTableManager.createTable()
+        proxy.eventManager.register(owner, offlineAuthTableManager)
+
         OfflineAuthCommandRegistrar.registerAll(
             commandManager = commandManagerProvider.chatCommandManager,
-            playerAccessor = playerAccessorProvider.hyperZonePlayers
+            authService = offlineAuthService
         )
         proxy.eventManager.register(owner, OfflineLimboEventListener())
         Logger.getLogger("HyperZoneLogin-AuthOffline")

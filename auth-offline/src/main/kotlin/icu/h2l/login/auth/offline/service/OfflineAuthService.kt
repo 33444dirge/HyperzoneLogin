@@ -1,0 +1,102 @@
+package icu.h2l.login.auth.offline.service
+
+import com.velocitypowered.api.proxy.Player
+import icu.h2l.api.player.HyperZonePlayerAccessor
+import icu.h2l.login.auth.offline.db.OfflineAuthEntry
+import icu.h2l.login.auth.offline.db.OfflineAuthRepository
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
+
+class OfflineAuthService(
+    private val repository: OfflineAuthRepository,
+    private val playerAccessor: HyperZonePlayerAccessor
+) {
+    data class Result(val success: Boolean, val message: String)
+
+    fun register(player: Player, password: String): Result {
+        val hyperZonePlayer = playerAccessor.getOrCreate(player)
+        if (!hyperZonePlayer.canRegister()) {
+            return Result(false, "§c其他渠道已注册，如有需要，请进行绑定")
+        }
+
+        if (repository.getByName(player.username) != null) {
+            return Result(false, "§c你已经注册过，无法重复注册")
+        }
+
+        val profile = hyperZonePlayer.register()
+        val hash = hashPassword(password)
+        val created = repository.create(
+            name = player.username,
+            passwordHash = hash,
+            hashFormat = HASH_FORMAT_SHA256,
+            profileId = profile.id
+        )
+        return if (created) {
+            Result(true, "§a注册成功")
+        } else {
+            Result(false, "§c注册失败，请稍后再试")
+        }
+    }
+
+    fun login(player: Player, password: String): Result {
+        val entry = repository.getByName(player.username) ?: return Result(false, "§c尚未注册")
+        if (!verifyPassword(password, entry)) {
+            return Result(false, "§c密码错误")
+        }
+
+        val hyperZonePlayer = playerAccessor.getOrCreate(player)
+        hyperZonePlayer.overVerify()
+        return Result(true, "§a登录成功，已通过验证")
+    }
+
+    fun changePassword(player: Player, oldPassword: String, newPassword: String): Result {
+        val entry = repository.getByName(player.username) ?: return Result(false, "§c尚未注册")
+        if (!verifyPassword(oldPassword, entry)) {
+            return Result(false, "§c旧密码错误")
+        }
+
+        val updated = repository.updatePassword(
+            profileId = entry.profileId,
+            passwordHash = hashPassword(newPassword),
+            hashFormat = HASH_FORMAT_SHA256
+        )
+        return if (updated) {
+            Result(true, "§a密码已更新")
+        } else {
+            Result(false, "§c密码更新失败，请稍后再试")
+        }
+    }
+
+    fun unregister(player: Player, password: String): Result {
+        val entry = repository.getByName(player.username) ?: return Result(false, "§c尚未注册")
+        if (!verifyPassword(password, entry)) {
+            return Result(false, "§c密码错误")
+        }
+
+        val deleted = repository.deleteByProfileId(entry.profileId)
+        return if (deleted) {
+            Result(true, "§a账号已注销")
+        } else {
+            Result(false, "§c注销失败，请稍后再试")
+        }
+    }
+
+    private fun verifyPassword(password: String, entry: OfflineAuthEntry): Boolean {
+        return when (entry.hashFormat.lowercase()) {
+            HASH_FORMAT_PLAIN -> password == entry.passwordHash
+            HASH_FORMAT_SHA256 -> hashPassword(password) == entry.passwordHash
+            else -> hashPassword(password) == entry.passwordHash
+        }
+    }
+
+    private fun hashPassword(password: String): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        val bytes = digest.digest(password.toByteArray(StandardCharsets.UTF_8))
+        return bytes.joinToString("") { byte -> "%02x".format(byte) }
+    }
+
+    companion object {
+        private const val HASH_FORMAT_PLAIN = "plain"
+        private const val HASH_FORMAT_SHA256 = "sha256"
+    }
+}
