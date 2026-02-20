@@ -19,6 +19,7 @@ import icu.h2l.login.database.DatabaseHelper
 import icu.h2l.login.limbo.LimboAuth
 import icu.h2l.login.util.registerApiLogger
 import icu.h2l.login.listener.EventListener
+import icu.h2l.login.manager.HyperZonePlayerManager
 import icu.h2l.login.manager.LoginServerManager
 import java.nio.file.Files
 import java.nio.file.Path
@@ -83,6 +84,7 @@ class HyperZoneLoginMain @Inject constructor(
 
         proxy.commandManager.register("hzl", HyperZoneLoginCommand())
         proxy.eventManager.register(this, EventListener())
+        proxy.eventManager.register(this, HyperZonePlayerManager)
         proxy.eventManager.register(this, limboServerManager)
 
     }

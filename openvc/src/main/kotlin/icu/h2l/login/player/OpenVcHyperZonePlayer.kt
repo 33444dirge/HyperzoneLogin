@@ -14,10 +14,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 class OpenVcHyperZonePlayer(
     private val proxyPlayer: Player
 ) : HyperZonePlayer {
-    companion object {
-        private const val REGISTER_UUID_PREFIX = "h2l"
-    }
-
     private val isVerifiedState = AtomicBoolean(false)
     private val hasSpawned = AtomicBoolean(false)
     private val messageQueue = ConcurrentLinkedQueue<Component>()
@@ -47,10 +43,12 @@ class OpenVcHyperZonePlayer(
             throw IllegalStateException("玩家 ${proxyPlayer.username} 已存在 Profile，无法重复注册")
         }
 
+        val remapPrefix = HyperZoneLoginMain.getRemapConfig().prefix
+
         val profile = Profile(
             id = UUID.randomUUID(),
             name = proxyPlayer.username,
-            uuid = RemapUtils.genUUID(proxyPlayer.username, REGISTER_UUID_PREFIX)
+            uuid = RemapUtils.genUUID(proxyPlayer.username, remapPrefix)
         )
 
         val created = databaseHelper.createProfile(profile.id, profile.name, profile.uuid)

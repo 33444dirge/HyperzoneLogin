@@ -1,5 +1,7 @@
 package icu.h2l.login.manager
 
+import com.velocitypowered.api.event.Subscribe
+import com.velocitypowered.api.event.connection.DisconnectEvent
 import com.velocitypowered.api.proxy.Player
 import icu.h2l.login.player.OpenVcHyperZonePlayer
 import java.util.UUID
@@ -39,5 +41,11 @@ object HyperZonePlayerManager {
         if (removed != null) {
             playersByName.entries.removeIf { (_, value) -> value === removed }
         }
+    }
+
+    @Subscribe
+    fun onDisconnect(event: DisconnectEvent) {
+        val player = event.player
+        remove(player.uniqueId, player.username)
     }
 }

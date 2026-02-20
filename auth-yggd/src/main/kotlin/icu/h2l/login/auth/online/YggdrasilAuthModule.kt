@@ -7,6 +7,7 @@ import icu.h2l.api.log.debug
 import icu.h2l.api.log.info
 import icu.h2l.api.player.HyperZonePlayer
 import icu.h2l.login.auth.online.config.entry.EntryConfig
+import icu.h2l.login.auth.online.db.EntryDatabaseHelper
 import icu.h2l.login.auth.online.db.EntryTableManager
 import icu.h2l.login.auth.online.manager.EntryConfigManager
 import icu.h2l.login.auth.online.req.AuthServerConfig
@@ -22,6 +23,7 @@ import java.net.http.HttpClient
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.logging.Logger
 import kotlin.collections.iterator
 import kotlin.compareTo
 import kotlin.or
@@ -54,6 +56,14 @@ class YggdrasilAuthModule(
      * Value: LimboAuthSessionHandler实例
      */
     private val limboHandlers = ConcurrentHashMap<String, HyperZonePlayer>()
+
+    private val pendingSecondBatch = ConcurrentHashMap<String, PendingSecondBatchData>()
+
+    private val entryDatabaseHelper = EntryDatabaseHelper(
+        databaseManager = databaseManager,
+        entryTableManager = entryTableManager,
+        logger = Logger.getLogger("HyperZoneLogin-AuthYggd")
+    )
 
     /**
      * 存储正在进行中的验证任务
@@ -100,6 +110,11 @@ class YggdrasilAuthModule(
                 try {
                     debug { "[YggdrasilFlow] 验证任务开始执行: user=$username" }
                     val result = performYggdrasilAuth(username, uuid, serverId, playerIp)
+                    if (result is YggdrasilAuthResult.PendingSecondBatch) {
+                        debug { "[YggdrasilFlow] 等待 LimboSpawn 触发第二批次验证: user=$username" }
+                        return@launch
+                    }
+
                     authResults[username] = result
                     debug { "[YggdrasilFlow] 验证任务完成并缓存结果: user=$username, result=${result.javaClass.simpleName}" }
                     limboHandlers[username]?.let { handler ->
@@ -137,6 +152,15 @@ class YggdrasilAuthModule(
         limboHandlers[username] = handler
         debug { "为玩家 $username 注册 LimboAuthSessionHandler" }
 
+        pendingSecondBatch.remove(username)?.let { pending ->
+            coroutineScope.launch {
+                val result = runSecondBatchAuth(pending, handler)
+                authResults[username] = result
+                dispatchAuthResultToHandler(username, handler, result)
+            }
+            return
+        }
+
         authResults[username]?.let { result ->
             debug { "[YggdrasilFlow] 命中已完成结果，立即回调: user=$username" }
             dispatchAuthResultToHandler(username, handler, result)
@@ -166,6 +190,7 @@ class YggdrasilAuthModule(
                 info { "玩家 $username 通过 Yggdrasil 验证，Entry: ${result.entryId}" }
                 if (!handler.isVerified()) {
                     handler.overVerify()
+                    debug { "玩家 $username 调用验证完成接口成功，Entry: ${result.entryId}"  }
                 }
                 return
             }
@@ -229,14 +254,52 @@ class YggdrasilAuthModule(
         debug { "第一批次验证未通过，开始第二批次（所有Yggdrasil服务器）" }
 
         // 第二批次：向所有Yggdrasil服务器发起请求
+        pendingSecondBatch[username] = PendingSecondBatchData(username, uuid, serverId, playerIp)
+        YggdrasilAuthResult.PendingSecondBatch
+    }
+
+    private suspend fun runSecondBatchAuth(
+        pending: PendingSecondBatchData,
+        handler: HyperZonePlayer
+    ): YggdrasilAuthResult {
+        if (!handler.canRegister()) {
+            debug { "玩家 ${pending.username} 不可注册，终止第二批次验证" }
+            return YggdrasilAuthResult.Failed("Player already registered")
+        }
+
         val allYggdrasilEntries = getAllYggdrasilEntries()
         val secondBatchRequests = buildAuthRequests(allYggdrasilEntries)
 
         if (secondBatchRequests.isEmpty()) {
-            return@runBlocking YggdrasilAuthResult.NoServersConfigured
+            return YggdrasilAuthResult.NoServersConfigured
         }
 
-        executeAuthRequests(username, serverId, playerIp, secondBatchRequests, "第二批次")
+        val secondBatchResult = executeAuthRequests(
+            pending.username,
+            pending.serverId,
+            pending.playerIp,
+            secondBatchRequests,
+            "第二批次"
+        )
+
+        if (secondBatchResult is YggdrasilAuthResult.Success) {
+            val registeredProfile = handler.register()
+            val entryName = secondBatchResult.profile.name ?: pending.username
+            val entryUuid = secondBatchResult.profile.id ?: pending.uuid
+
+            val bound = entryDatabaseHelper.createEntry(
+                entryId = secondBatchResult.entryId,
+                name = entryName,
+                uuid = entryUuid,
+                pid = registeredProfile.id
+            )
+
+            if (!bound) {
+                return YggdrasilAuthResult.Failed("绑定 Entry 记录失败")
+            }
+        }
+
+        return secondBatchResult
     }
 
     /**
@@ -418,6 +481,19 @@ sealed class YggdrasilAuthResult {
     object NoServersConfigured : YggdrasilAuthResult() {
     }
 
+    /**
+     * 等待 LimboSpawn 触发第二批次验证
+     */
+    object PendingSecondBatch : YggdrasilAuthResult() {
+    }
+
     val isSuccess: Boolean
         get() = this is Success
 }
+
+private data class PendingSecondBatchData(
+    val username: String,
+    val uuid: UUID,
+    val serverId: String,
+    val playerIp: String?
+)
