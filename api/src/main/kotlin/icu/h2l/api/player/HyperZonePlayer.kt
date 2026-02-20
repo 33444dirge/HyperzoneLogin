@@ -2,6 +2,7 @@ package icu.h2l.api.player
 
 import icu.h2l.api.db.Profile
 import net.kyori.adventure.text.Component
+import java.util.UUID
 
 /**
  * HyperZone 登录流程中的统一玩家抽象。
@@ -22,7 +23,7 @@ interface HyperZonePlayer {
      *
      * @return 写入数据库后的 Profile 对象
      */
-    fun register(): Profile
+    fun register(userName: String? = null, uuid: UUID? = null): Profile
 
     /**
      * 获取当前玩家对应的 Profile。

@@ -38,17 +38,20 @@ class OpenVcHyperZonePlayer(
         return profile == null
     }
 
-    override fun register(): Profile {
-        if (!canRegister()) {
-            throw IllegalStateException("玩家 ${proxyPlayer.username} 已存在 Profile，无法重复注册")
+    override fun register(userName: String?, uuid: UUID?): Profile {
+        val resolvedName = userName ?: proxyPlayer.username
+        val remapPrefix = HyperZoneLoginMain.getRemapConfig().prefix
+        val resolvedUuid = uuid ?: RemapUtils.genUUID(resolvedName, remapPrefix)
+
+        val existing = databaseHelper.getProfileByNameOrUuid(resolvedName, resolvedUuid)
+        if (existing != null) {
+            throw IllegalStateException("玩家 $resolvedName 已存在 Profile，无法重复注册")
         }
 
-        val remapPrefix = HyperZoneLoginMain.getRemapConfig().prefix
-
         val profile = Profile(
-            id = UUID.randomUUID(),
-            name = proxyPlayer.username,
-            uuid = RemapUtils.genUUID(proxyPlayer.username, remapPrefix)
+            id = RemapUtils.genUUID(resolvedName, "h2l"),
+            name = resolvedName,
+            uuid = resolvedUuid
         )
 
         val created = databaseHelper.createProfile(profile.id, profile.name, profile.uuid)
