@@ -3,15 +3,16 @@ package icu.h2l.login.manager
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.DisconnectEvent
 import com.velocitypowered.api.proxy.Player
+import icu.h2l.api.player.HyperZonePlayerAccessor
 import icu.h2l.login.player.OpenVcHyperZonePlayer
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
-object HyperZonePlayerManager {
+object HyperZonePlayerManager : HyperZonePlayerAccessor {
     private val playersByUuid = ConcurrentHashMap<UUID, OpenVcHyperZonePlayer>()
     private val playersByName = ConcurrentHashMap<String, OpenVcHyperZonePlayer>()
 
-    fun getOrCreate(proxyPlayer: Player): OpenVcHyperZonePlayer {
+    override fun getOrCreate(proxyPlayer: Player): OpenVcHyperZonePlayer {
         return playersByUuid.computeIfAbsent(proxyPlayer.uniqueId) {
             OpenVcHyperZonePlayer(proxyPlayer)
         }.also { player ->
@@ -19,15 +20,15 @@ object HyperZonePlayerManager {
         }
     }
 
-    fun getByUuid(uuid: UUID): OpenVcHyperZonePlayer? {
+    override fun getByUuid(uuid: UUID): OpenVcHyperZonePlayer? {
         return playersByUuid[uuid]
     }
 
-    fun getByName(name: String): OpenVcHyperZonePlayer? {
+    override fun getByName(name: String): OpenVcHyperZonePlayer? {
         return playersByName[name.lowercase()]
     }
 
-    fun getByNameOrUuid(name: String, uuid: UUID): OpenVcHyperZonePlayer? {
+    override fun getByNameOrUuid(name: String, uuid: UUID): OpenVcHyperZonePlayer? {
         return getByUuid(uuid) ?: getByName(name)
     }
 

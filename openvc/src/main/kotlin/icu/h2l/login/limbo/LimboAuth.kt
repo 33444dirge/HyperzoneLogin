@@ -4,6 +4,7 @@ import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.plugin.PluginContainer
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
+import icu.h2l.api.limbo.HyperZoneLimbo
 import icu.h2l.login.limbo.handler.LimboAuthSessionHandler
 import icu.h2l.login.manager.HyperZonePlayerManager
 import net.elytrium.limboapi.api.Limbo
@@ -14,9 +15,11 @@ import net.elytrium.limboapi.api.event.LoginLimboRegisterEvent
 import net.elytrium.limboapi.api.player.GameMode
 
 //用于注册到limbo服务器，不需要融合于任何模块目前
-class LimboAuth(server: ProxyServer) {
+class LimboAuth(server: ProxyServer) : HyperZoneLimbo {
     private val factory: LimboFactory
-    private lateinit var authServer: Limbo
+    private lateinit var limboAuthServer: Limbo
+    override val authServer: Limbo
+        get() = limboAuthServer
 
     init {
         factory = server.pluginManager.getPlugin("limboapi")
@@ -31,7 +34,7 @@ class LimboAuth(server: ProxyServer) {
             0f, 0f
         )
 
-        authServer = factory
+        limboAuthServer = factory
             .createLimbo(authWorld)
             .setName("HyperzoneLogin")
             .setWorldTime(1000L)

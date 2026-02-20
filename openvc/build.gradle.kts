@@ -4,6 +4,7 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":auth-offline"))
     implementation(project(":auth-yggd"))
     implementation(project(":api"))
 //    implementation(project(":vcinjector"))
@@ -73,6 +74,7 @@ tasks {
 //           api
             include(dependency(":api"))
 //            模块
+            include(dependency(":auth-offline"))
             include(dependency(":auth-yggd"))
         }
     }

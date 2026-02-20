@@ -8,7 +8,12 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import icu.h2l.api.event.db.TableSchemaAction
 import icu.h2l.api.event.db.TableSchemaEvent
+import icu.h2l.api.limbo.HyperZoneLimbo
+import icu.h2l.api.limbo.HyperZoneLimboProvider
 import icu.h2l.api.module.HyperSubModule
+import icu.h2l.api.player.HyperZonePlayerAccessor
+import icu.h2l.api.player.HyperZonePlayerAccessorProvider
+import icu.h2l.login.auth.offline.OfflineSubModule
 import icu.h2l.login.auth.online.YggdrasilSubModule
 import icu.h2l.login.command.HyperZoneLoginCommand
 import icu.h2l.login.config.DatabaseSourceConfig
@@ -36,11 +41,15 @@ class HyperZoneLoginMain @Inject constructor(
     val logger: ComponentLogger,
     @DataDirectory private val dataDirectory: Path,
     private val injector: Injector
-) {
+) : HyperZoneLimboProvider, HyperZonePlayerAccessorProvider {
     lateinit var loginServerManager: LoginServerManager
     lateinit var limboServerManager: LimboAuth
     lateinit var databaseManager: icu.h2l.login.manager.DatabaseManager
     lateinit var databaseHelper: DatabaseHelper
+    override val limboAuth: HyperZoneLimbo
+        get() = limboServerManager
+    override val hyperZonePlayers: HyperZonePlayerAccessor
+        get() = HyperZonePlayerManager
 
 
     companion object {
@@ -76,13 +85,16 @@ class HyperZoneLoginMain @Inject constructor(
         // 创建基础表（Profile 表等）
         createBaseTables()
 
-        registerModule(VelocityNetworkModule())
-        registerModule(YggdrasilSubModule())
-
-
         loginServerManager = LoginServerManager()
         limboServerManager = LimboAuth(server)
         limboServerManager.load()
+
+//        最后加载模块
+        registerModule(VelocityNetworkModule())
+        registerModule(OfflineSubModule())
+        registerModule(YggdrasilSubModule())
+
+
 
         proxy.commandManager.register("hzl", HyperZoneLoginCommand())
         proxy.eventManager.register(this, EventListener())
