@@ -38,6 +38,11 @@ interface HyperZonePlayer {
     fun isVerified(): Boolean
 
     /**
+     * 判断是否允许进行绑定流程。
+     */
+    fun canBind(): Boolean
+
+    /**
      * 结束玩家验证流程。
      */
     fun overVerify()

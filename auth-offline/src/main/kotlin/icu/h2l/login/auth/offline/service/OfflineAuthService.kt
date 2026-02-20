@@ -38,6 +38,30 @@ class OfflineAuthService(
         }
     }
 
+    fun bind(player: Player, password: String): Result {
+        val hyperZonePlayer = playerAccessor.getOrCreate(player)
+        if (!hyperZonePlayer.canBind()) {
+            return Result(false, "§c尚未完成验证，无法绑定")
+        }
+
+        val profile = hyperZonePlayer.getProfile() ?: return Result(false, "§c未找到档案，无法绑定")
+        if (repository.getByProfileId(profile.id) != null || repository.getByName(player.username) != null) {
+            return Result(false, "§c已绑定，无需重复绑定")
+        }
+
+        val created = repository.create(
+            name = player.username,
+            passwordHash = hashPassword(password),
+            hashFormat = HASH_FORMAT_SHA256,
+            profileId = profile.id
+        )
+        return if (created) {
+            Result(true, "§a绑定成功")
+        } else {
+            Result(false, "§c绑定失败，请稍后再试")
+        }
+    }
+
     fun login(player: Player, password: String): Result {
         val entry = repository.getByName(player.username) ?: return Result(false, "§c尚未注册")
         if (!verifyPassword(password, entry)) {

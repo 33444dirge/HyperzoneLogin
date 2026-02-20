@@ -70,6 +70,10 @@ class OpenVcHyperZonePlayer(
         return isVerifiedState.get()
     }
 
+    override fun canBind(): Boolean {
+        return isVerified()
+    }
+
     override fun overVerify() {
         if (isVerifiedState.compareAndSet(false, true)) {
             limboPlayer?.disconnect()
