@@ -3,7 +3,7 @@ package icu.h2l.login.auth.online.req
 import java.time.Duration
 
 /**
- * 验证服务器配置
+ * 验证Entry配置
  */
 data class AuthServerConfig(
     val url: String,
@@ -29,3 +29,11 @@ interface AuthenticationRequest {
         playerIp: String? = null
     ): AuthenticationResult
 }
+
+/**
+ * 带有Entry ID的验证请求
+ */
+data class AuthenticationRequestEntry(
+    val entryId: String,
+    val request: AuthenticationRequest
+)

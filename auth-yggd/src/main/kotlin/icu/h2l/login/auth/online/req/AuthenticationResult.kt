@@ -9,11 +9,12 @@ sealed class AuthenticationResult {
     /**
      * 验证成功
      * @param profile 玩家的游戏档案
-     * @param serverUrl 成功验证的服务器URL
+        * @param serverUrl 成功验证的Entry URL
      */
     data class Success(
         val profile: GameProfile,
-        val serverUrl: String
+        val serverUrl: String,
+        val entryId: String? = null
     ) : AuthenticationResult()
 
     /**
@@ -28,7 +29,7 @@ sealed class AuthenticationResult {
 
     /**
      * 验证超时
-     * @param attemptedServers 尝试的服务器列表
+        * @param attemptedServers 尝试的Entry列表
      */
     data class Timeout(
         val attemptedServers: List<String>

@@ -13,6 +13,7 @@ import icu.h2l.login.auth.online.db.EntryTableManager
 import icu.h2l.login.auth.online.manager.EntryConfigManager
 import icu.h2l.login.auth.online.req.AuthServerConfig
 import icu.h2l.login.auth.online.req.AuthenticationRequest
+import icu.h2l.login.auth.online.req.AuthenticationRequestEntry
 import icu.h2l.login.auth.online.req.AuthenticationResult
 import icu.h2l.login.auth.online.req.ConcurrentAuthenticationManager
 import icu.h2l.login.auth.online.req.MojangStyleAuthRequest
@@ -203,7 +204,7 @@ class YggdrasilAuthModule(
             val failureReason = when (result) {
                 is YggdrasilAuthResult.Failed -> result.reason
                 is YggdrasilAuthResult.Timeout -> "Timeout"
-                is YggdrasilAuthResult.NoServersConfigured -> "No servers configured"
+                is YggdrasilAuthResult.NoEntriesConfigured -> "No entries configured"
                 is YggdrasilAuthResult.PendingSecondBatch -> "Pending second batch"
             }
             handler.sendMessage(Component.text("玩家 $username Yggdrasil 验证失败"))
@@ -235,9 +236,9 @@ class YggdrasilAuthModule(
      * 
      * 验证逻辑分为两个批次：
      * 1. 第一批次：查询数据库中是否有该玩家的记录（通过UUID或用户名），
-     *    如果有，则向对应的Entry服务器发起验证请求
+    *    如果有，则向对应的Entry验证入口发起验证请求
      * 2. 第二批次：如果第一批次没有找到或验证失败，
-     *    则向所有配置的Yggdrasil服务器发起验证请求
+    *    则向所有配置的Yggdrasil Entry发起验证请求
      * 
      * @param username 玩家用户名
      * @param uuid 玩家UUID
@@ -280,9 +281,9 @@ class YggdrasilAuthModule(
             }
         }
 
-        debug { "第一批次验证未通过，开始第二批次（所有Yggdrasil服务器）" }
+        debug { "第一批次验证未通过，开始第二批次（所有Yggdrasil Entry）" }
 
-        // 第二批次：向所有Yggdrasil服务器发起请求
+        // 第二批次：向所有Yggdrasil Entry发起请求
         pendingSecondBatch[player] = PendingSecondBatchData(username, uuid, serverId, playerIp)
         YggdrasilAuthResult.PendingSecondBatch
     }
@@ -342,7 +343,7 @@ class YggdrasilAuthModule(
         val secondBatchRequests = buildAuthRequests(allYggdrasilEntries)
 
         if (secondBatchRequests.isEmpty()) {
-            return YggdrasilAuthResult.NoServersConfigured
+            return YggdrasilAuthResult.NoEntriesConfigured
         }
 
         val secondBatchResult = executeAuthRequests(
@@ -470,11 +471,11 @@ class YggdrasilAuthModule(
         requests: List<Pair<String, AuthenticationRequest>>,
         batchName: String
     ): YggdrasilAuthResult {
-        debug { "$batchName: 开始并发验证，共 ${requests.size} 个服务器" }
+        debug { "$batchName: 开始并发验证，共 ${requests.size} 个 Entry" }
 
         // 创建并发验证管理器
         val authManager = ConcurrentAuthenticationManager(
-            authRequests = requests.map { it.second },
+            authRequests = requests.map { AuthenticationRequestEntry(it.first, it.second) },
             globalTimeout = Duration.ofSeconds(30)
         )
 
@@ -483,22 +484,9 @@ class YggdrasilAuthModule(
 
         return when (result) {
             is AuthenticationResult.Success -> {
-                // 找到成功验证的Entry ID
-                val successIndex = requests.indexOfFirst {
-                    it.second.toString() == result.serverUrl ||
-                            result.serverUrl.contains(it.first)
-                }
-
-                val entryId = if (successIndex >= 0) {
-                    requests[successIndex].first
-                } else {
-                    // 尝试从URL中提取
-                    requests.firstOrNull()?.first ?: "unknown"
-                }
-
                 YggdrasilAuthResult.Success(
                     profile = result.profile,
-                    entryId = entryId,
+                    entryId = result.entryId ?: "unknown",
                     serverUrl = result.serverUrl
                 )
             }
@@ -547,9 +535,9 @@ sealed class YggdrasilAuthResult {
     }
 
     /**
-     * 没有配置的服务器
+    * 没有配置的Entry
      */
-    object NoServersConfigured : YggdrasilAuthResult() {
+    object NoEntriesConfigured : YggdrasilAuthResult() {
     }
 
     /**

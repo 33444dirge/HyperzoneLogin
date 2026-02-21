@@ -10,10 +10,10 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * 并发验证管理器
- * 支持向多个验证服务器并发发送请求，任意一个成功即返回
+ * 支持向多个Entry并发发送请求，任意一个成功即返回
  */
 class ConcurrentAuthenticationManager(
-    private val authRequests: List<AuthenticationRequest>,
+    private val authRequests: List<AuthenticationRequestEntry>,
     private val globalTimeout: Duration = Duration.ofSeconds(30)
 ) {
     
@@ -31,11 +31,11 @@ class ConcurrentAuthenticationManager(
     ): AuthenticationResult = coroutineScope {
         if (authRequests.isEmpty()) {
             return@coroutineScope AuthenticationResult.Failure(
-                reason = "No authentication servers configured"
+                reason = "未配置可用的认证条目"
             )
         }
 
-        debug { "Starting concurrent authentication for user: $username with ${authRequests.size} servers" }
+        debug { "开始并发认证，玩家: $username，条目数量: ${authRequests.size}" }
 
         // 用于标记是否已经有成功的结果
         val completed = AtomicBoolean(false)
@@ -47,20 +47,21 @@ class ConcurrentAuthenticationManager(
             // 设置全局超时
             withTimeout(globalTimeout.toMillis()) {
                 // 为每个验证请求创建一个协程
-                val jobs = authRequests.mapIndexed { index, authRequest ->
+                val jobs = authRequests.map { authRequestEntry ->
                     async(Dispatchers.IO) {
+                        val entryId = authRequestEntry.entryId
                         if (completed.get()) {
-                            debug { "Server $index: Skipping - another server already succeeded" }
+                            debug { "条目 $entryId: 跳过执行 - 其他条目已先成功" }
                             return@async null
                         }
 
-                        debug { "Server $index: Starting authentication request" }
+                        debug { "条目 $entryId: 开始认证请求" }
                         val result = try {
-                            authRequest.authenticate(username, serverId, playerIp)
+                            authRequestEntry.request.authenticate(username, serverId, playerIp)
                         } catch (e: Exception) {
-                            debug { "Server $index: Exception occurred - ${e.message}" }
+                            debug { "条目 $entryId: 发生异常 - ${e.message}" }
                             AuthenticationResult.Failure(
-                                reason = "Exception: ${e.message}",
+                                reason = "发生异常: ${e.message}",
                                 statusCode = null
                             )
                         }
@@ -71,24 +72,24 @@ class ConcurrentAuthenticationManager(
                                 // 检查是否是第一个成功的
                                 if (completed.compareAndSet(false, true)) {
                                     mutex.withLock {
-                                        successResult = result
+                                        successResult = result.copy(entryId = entryId)
                                     }
-                                    info { "Server $index: Authentication succeeded for $username" }
+                                    info { "条目 $entryId: 玩家 $username 认证成功" }
                                     result
                                 } else {
-                                    debug { "Server $index: Succeeded but another server was faster" }
+                                    debug { "条目 $entryId: 当前请求成功，但其他条目更快返回" }
                                     null
                                 }
                             }
                             is AuthenticationResult.Failure -> {
-                                debug { "Server $index: Authentication failed - ${result.reason}" }
+                                debug { "条目 $entryId: 认证失败 - ${result.reason}" }
                                 mutex.withLock {
                                     failures.add(result)
                                 }
                                 null
                             }
                             is AuthenticationResult.Timeout -> {
-                                debug { "Server $index: Authentication timed out" }
+                                debug { "条目 $entryId: 认证超时" }
                                 null
                             }
                         }
@@ -113,23 +114,23 @@ class ConcurrentAuthenticationManager(
                 jobs.forEach { it.cancelAndJoin() }
             }
         } catch (e: TimeoutCancellationException) {
-            info { "Authentication timed out for user: $username after ${globalTimeout.toMillis()}ms" }
+            info { "玩家 $username 认证超时，耗时 ${globalTimeout.toMillis()}ms" }
             return@coroutineScope AuthenticationResult.Timeout(
-                attemptedServers = authRequests.map { it.toString() }
+                attemptedServers = authRequests.map { it.entryId }
             )
         }
 
         // 返回结果
         successResult?.let {
-            debug { "Returning success result for $username" }
+            debug { "返回玩家 $username 的认证成功结果" }
             return@coroutineScope it
         }
 
         // 如果没有成功结果，返回综合的失败信息
-        info { "All authentication servers failed for user: $username" }
+        info { "玩家 $username 的所有认证条目均失败" }
         return@coroutineScope AuthenticationResult.Failure(
-            reason = "All ${authRequests.size} authentication servers failed. " +
-                    "Failures: ${failures.joinToString("; ") { "${it.statusCode ?: "N/A"}: ${it.reason}" }}"
+            reason = "${authRequests.size} 个认证条目全部失败。" +
+                    "失败详情: ${failures.joinToString("; ") { "${it.statusCode ?: "无"}: ${it.reason}" }}"
         )
     }
 }
@@ -138,15 +139,15 @@ class ConcurrentAuthenticationManager(
  * 构建器类，用于创建 ConcurrentAuthenticationManager
  */
 class ConcurrentAuthenticationManagerBuilder {
-    private val authRequests = mutableListOf<AuthenticationRequest>()
+    private val authRequests = mutableListOf<AuthenticationRequestEntry>()
     private var globalTimeout: Duration = Duration.ofSeconds(30)
 
-    fun addAuthRequest(request: AuthenticationRequest): ConcurrentAuthenticationManagerBuilder {
-        authRequests.add(request)
+    fun addAuthRequest(entry: AuthenticationRequestEntry): ConcurrentAuthenticationManagerBuilder {
+        authRequests.add(entry)
         return this
     }
 
-    fun addAuthRequests(requests: List<AuthenticationRequest>): ConcurrentAuthenticationManagerBuilder {
+    fun addAuthRequests(requests: List<AuthenticationRequestEntry>): ConcurrentAuthenticationManagerBuilder {
         authRequests.addAll(requests)
         return this
     }

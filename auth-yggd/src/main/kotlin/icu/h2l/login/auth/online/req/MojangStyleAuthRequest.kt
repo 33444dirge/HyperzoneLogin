@@ -11,7 +11,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
 /**
- * Mojang风格的验证服务器请求实现
+ * Mojang风格的Entry验证请求实现
  */
 class MojangStyleAuthRequest(
     private val config: AuthServerConfig,
@@ -34,7 +34,7 @@ class MojangStyleAuthRequest(
             handleResponse(response, config.url)
         } catch (e: Exception) {
             AuthenticationResult.Failure(
-                reason = "Request failed: ${e.message}",
+                reason = "请求失败: ${e.message}",
                 statusCode = null
             )
         }
@@ -92,7 +92,7 @@ class MojangStyleAuthRequest(
                     AuthenticationResult.Success(profile, serverUrl)
                 } catch (e: Exception) {
                     AuthenticationResult.Failure(
-                        reason = "Failed to parse response: ${e.message} body:${body}",
+                        reason = "响应解析失败: ${e.message}，body:${body}",
                         statusCode = 200
                     )
                 }
@@ -100,13 +100,13 @@ class MojangStyleAuthRequest(
             204 -> {
                 // 离线模式用户尝试登录在线模式代理
                 AuthenticationResult.Failure(
-                    reason = "Offline mode player attempted to join online mode server",
+                    reason = "离线模式玩家尝试加入在线模式服务器",
                     statusCode = 204
                 )
             }
             else -> {
                 AuthenticationResult.Failure(
-                    reason = "Unexpected status code from authentication server",
+                    reason = "认证服务器返回了预期之外的状态码",
                     statusCode = response.statusCode()
                 )
             }
