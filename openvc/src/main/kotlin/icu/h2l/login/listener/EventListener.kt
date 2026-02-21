@@ -1,8 +1,11 @@
 package icu.h2l.login.listener
 
 import com.velocitypowered.api.event.Subscribe
+import com.velocitypowered.api.event.player.GameProfileRequestEvent
 import com.velocitypowered.api.util.GameProfile
-import icu.h2l.api.event.connection.HyperZoneGameProfileRequestEvent
+import com.velocitypowered.proxy.connection.client.InitialInboundConnection
+import icu.h2l.api.connection.getChannel
+import icu.h2l.api.connection.getInitialChannel
 import icu.h2l.api.event.connection.OpenPreLoginEvent
 import icu.h2l.login.HyperZoneLoginMain
 import icu.h2l.login.manager.HyperZonePlayerManager
@@ -29,21 +32,21 @@ class EventListener {
         } else {
             event.isOnline = true
         }
-        HyperZonePlayerManager.create(event.channel,event.userName,event.uuid)
+        HyperZonePlayerManager.create(event.channel, event.userName, event.uuid)
         info { "传入 UUID 信息玩家: $name UUID:$uuid 类型: $offlineUUIDType 在线:${event.isOnline}" }
     }
 
     @Subscribe
-    fun onPreLogin(event: HyperZoneGameProfileRequestEvent) {
-        val hyperZonePlayer = HyperZonePlayerManager.getByPlayer(event.player)
+    fun onPreLogin(event: GameProfileRequestEvent) {
+        val hyperZonePlayer = HyperZonePlayerManager.getByChannel(event.connection.getInitialChannel())
         val originalProfile = event.originalProfile
 
         val resolvedProfile = hyperZonePlayer.getProfile()
         if (resolvedProfile == null) {
             HyperZoneLoginMain.getInstance().logger.error(
-                "玩家 ${event.player.username} 在 GameProfileRequest 阶段未找到 Profile，已拒绝连接"
+                "玩家 ${event.gameProfile.name} 在 GameProfileRequest 阶段未找到 Profile，已拒绝连接"
             )
-            event.player.disconnect(
+            (event.connection as InitialInboundConnection).disconnect(
                 Component.text("登录失败：未找到你的档案信息，请联系管理员。", NamedTextColor.RED)
             )
             return
