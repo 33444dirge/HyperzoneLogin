@@ -27,6 +27,7 @@ import icu.h2l.login.database.DatabaseHelper
 import icu.h2l.login.inject.network.VelocityNetworkModule
 import icu.h2l.login.limbo.LimboAuth
 import icu.h2l.login.limbo.command.ExitLimboCommand
+import icu.h2l.login.merge.MergeSubModule
 import icu.h2l.login.util.registerApiLogger
 import icu.h2l.login.listener.EventListener
 import icu.h2l.login.manager.HyperChatCommandManagerImpl
@@ -108,6 +109,7 @@ class HyperZoneLoginMain @Inject constructor(
         registerModule(VelocityNetworkModule())
         registerModule(OfflineSubModule())
         registerModule(YggdrasilSubModule())
+        registerModule(MergeSubModule())
 
 
 

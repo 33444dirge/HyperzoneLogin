@@ -6,6 +6,7 @@ plugins {
 dependencies {
     implementation(project(":auth-offline"))
     implementation(project(":auth-yggd"))
+    implementation(project(":data-merge"))
     implementation(project(":api"))
 //    implementation(project(":vcinjector"))
 
@@ -15,7 +16,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:0.58.0")
     implementation("org.jetbrains.exposed:exposed-java-time:0.58.0")
 // Database drivers
-    implementation("com.h2database:h2:2.2.224")
+    implementation("com.h2database:h2:2.1.214")
     implementation("org.xerial:sqlite-jdbc:3.47.1.0")
     implementation("mysql:mysql-connector-java:8.0.33")
     implementation("com.zaxxer:HikariCP:5.0.1")
@@ -76,6 +77,7 @@ tasks {
 //            模块
             include(dependency(":auth-offline"))
             include(dependency(":auth-yggd"))
+            include(dependency(":data-merge"))
         }
     }
     build {
