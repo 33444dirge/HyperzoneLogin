@@ -5,8 +5,8 @@ import icu.h2l.api.db.HyperZoneDatabaseManager
 import icu.h2l.api.db.table.ProfileTable
 import icu.h2l.api.event.db.TableSchemaAction
 import icu.h2l.api.event.db.TableSchemaEvent
-import icu.h2l.api.log.info
 import icu.h2l.api.log.warn
+import icu.h2l.login.auth.offline.api.db.OfflineAuthTable
 import org.jetbrains.exposed.sql.SchemaUtils
 
 class OfflineAuthTableManager(

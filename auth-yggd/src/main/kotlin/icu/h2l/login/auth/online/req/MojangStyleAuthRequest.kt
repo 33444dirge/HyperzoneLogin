@@ -17,7 +17,7 @@ class MojangStyleAuthRequest(
     private val config: AuthServerConfig,
     private val httpClient: HttpClient,
     private val gson: Gson,
-    private val userAgent: String = "VelocityProxy/1.0"
+    private val userAgent: String = "HyperZoneLogin/1.0"
 ) : AuthenticationRequest {
 
     override suspend fun authenticate(

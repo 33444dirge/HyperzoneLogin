@@ -2,7 +2,7 @@ package icu.h2l.login.auth.offline.service
 
 import com.velocitypowered.api.proxy.Player
 import icu.h2l.api.player.HyperZonePlayerAccessor
-import icu.h2l.login.auth.offline.db.OfflineAuthEntry
+import icu.h2l.login.auth.offline.api.db.OfflineAuthEntry
 import icu.h2l.login.auth.offline.db.OfflineAuthRepository
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest

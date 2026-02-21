@@ -1,4 +1,4 @@
-package icu.h2l.login.auth.offline.db
+package icu.h2l.login.auth.offline.api.db
 
 import icu.h2l.api.db.table.ProfileTable
 import org.jetbrains.exposed.sql.Table
