@@ -1,5 +1,7 @@
 package icu.h2l.api.player
 
+import com.velocitypowered.api.proxy.Player
+import com.velocitypowered.api.util.GameProfile
 import icu.h2l.api.db.Profile
 import net.kyori.adventure.text.Component
 import java.util.UUID
@@ -14,7 +16,17 @@ interface HyperZonePlayer {
     /**
      * 当前玩家的用户名（登录流程内的统一名称）。
      */
-    val username: String
+    val userName: String
+
+    /**
+     * 当前玩家的UUID（登录流程内的统一名称）。
+     */
+    val uuid: UUID
+
+    /**
+     * 当前玩家的代理玩家。
+     */
+    var proxyPlayer: Player?
 
     /**
      * 判断是否允许执行注册流程。
@@ -56,4 +68,10 @@ interface HyperZonePlayer {
      * 发送消息给玩家。
      */
     fun sendMessage(message: Component)
+
+
+    /**
+     * 获取当前玩家对应的 GameProfile。
+     */
+    fun getGameProfile(): GameProfile
 }

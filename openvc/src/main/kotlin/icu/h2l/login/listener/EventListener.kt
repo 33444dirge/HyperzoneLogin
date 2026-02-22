@@ -19,8 +19,8 @@ import kotlin.random.Random
 
 class EventListener {
     companion object {
-        private const val EXPECTED_NAME_PREFIX = "hzl-login-"
-        private const val REMAP_PREFIX = "check"
+        public const val EXPECTED_NAME_PREFIX = "hzl-login-"
+        public const val REMAP_PREFIX = "check"
         private const val PLUGIN_CONFLICT_MESSAGE = "登录失败：检测到插件冲突。"
     }
 
@@ -46,10 +46,9 @@ class EventListener {
 
     @Subscribe
     fun onOnlineAuth(event: OnlineAuthEvent) {
-        val randomId = String.format("%06d", Random.nextInt(1_000_000))
-        val newName = "$EXPECTED_NAME_PREFIX$randomId"
-        event.gameProfile = RemapUtils.genProfile(newName, REMAP_PREFIX)
+        event.gameProfile = RemapUtils.randomProfile()
     }
+
 
     @Subscribe
     fun onPreLogin(event: GameProfileRequestEvent) {

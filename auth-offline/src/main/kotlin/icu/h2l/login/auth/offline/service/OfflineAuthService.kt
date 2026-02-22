@@ -15,7 +15,7 @@ class OfflineAuthService(
 
     fun register(player: Player, password: String): Result {
         val hyperZonePlayer = playerAccessor.getByPlayer(player)
-        val username = hyperZonePlayer.username
+        val username = hyperZonePlayer.userName
         if (!hyperZonePlayer.canRegister()) {
             return Result(false, "§c其他渠道已注册，如有需要，请进行绑定")
         }
@@ -41,7 +41,7 @@ class OfflineAuthService(
 
     fun bind(player: Player, password: String): Result {
         val hyperZonePlayer = playerAccessor.getByPlayer(player)
-        val username = hyperZonePlayer.username
+        val username = hyperZonePlayer.userName
         if (!hyperZonePlayer.canBind()) {
             return Result(false, "§c尚未完成验证，无法绑定")
         }
@@ -65,7 +65,7 @@ class OfflineAuthService(
     }
 
     fun login(player: Player, password: String): Result {
-        val username = playerAccessor.getByPlayer(player).username
+        val username = playerAccessor.getByPlayer(player).userName
         val entry = repository.getByName(username) ?: return Result(false, "§c尚未注册")
         if (!verifyPassword(password, entry)) {
             return Result(false, "§c密码错误")
@@ -77,7 +77,7 @@ class OfflineAuthService(
     }
 
     fun changePassword(player: Player, oldPassword: String, newPassword: String): Result {
-        val username = playerAccessor.getByPlayer(player).username
+        val username = playerAccessor.getByPlayer(player).userName
         val entry = repository.getByName(username) ?: return Result(false, "§c尚未注册")
         if (!verifyPassword(oldPassword, entry)) {
             return Result(false, "§c旧密码错误")
@@ -96,7 +96,7 @@ class OfflineAuthService(
     }
 
     fun unregister(player: Player, password: String): Result {
-        val username = playerAccessor.getByPlayer(player).username
+        val username = playerAccessor.getByPlayer(player).userName
         val entry = repository.getByName(username) ?: return Result(false, "§c尚未注册")
         if (!verifyPassword(password, entry)) {
             return Result(false, "§c密码错误")

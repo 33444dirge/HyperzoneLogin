@@ -1,6 +1,7 @@
 package icu.h2l.login.player
 
 import com.velocitypowered.api.proxy.Player
+import com.velocitypowered.api.util.GameProfile
 import icu.h2l.api.db.Profile
 import icu.h2l.api.player.HyperZonePlayer
 import icu.h2l.login.HyperZoneLoginMain
@@ -13,15 +14,14 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class OpenVcHyperZonePlayer(
 //    最开始客户端传入的，不可信
-    private var userName: String,
-    private var uuid: UUID,
+    override var userName: String,
+    override var uuid: UUID,
 ) : HyperZonePlayer {
-    override val username: String
-        get() = userName
+
+    override var proxyPlayer: Player? = null
 
     @Volatile
     var profileId: UUID? = null
-    var proxyPlayer: Player? = null
 
     private val isVerifiedState = AtomicBoolean(false)
     private val hasSpawned = AtomicBoolean(false)
@@ -118,5 +118,14 @@ class OpenVcHyperZonePlayer(
         }
 
         messageQueue.offer(message)
+    }
+
+    override fun getGameProfile(): GameProfile {
+        val resolvedProfile = getProfile()
+        return GameProfile(
+            resolvedProfile!!.uuid,
+            resolvedProfile.name,
+            ArrayList()
+        )
     }
 }
