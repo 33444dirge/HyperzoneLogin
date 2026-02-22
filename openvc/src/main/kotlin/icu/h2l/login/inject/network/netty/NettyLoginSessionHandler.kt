@@ -241,6 +241,8 @@ class NettyLoginSessionHandler(
                     )
 
                 mcConnection.setActiveSessionHandler(StateRegistry.LOGIN, authSessionHandler)
+
+                retire()
             }, mcConnection.eventLoop()
         ).exceptionally { ex: Throwable? ->
             logger.error("Exception in login stage", ex)
